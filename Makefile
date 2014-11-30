@@ -2,7 +2,7 @@
 
 COMPILER = gcc 
 LIBS =  -lm
-CFLAGS = #-fPIC -g -c -Wall -o
+CFLAGS = #-std=c89 -pedantic -W -Wall -Wstrict-prototypes -Wunreachable-code  -Wwrite-strings -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual #-fPIC -g -c -Wall -o
 COPTS =  -fPIC -g -c -Wall -lm -march=nocona -O3 -mmmx -msse -pthread -o 
 LIBPATH = 
 
@@ -20,5 +20,5 @@ cluster.o: cluster.c
 	$(COMPILER) $(COPTS) cluster.o cluster.c  $(LIBS) $(CFLAGS)
 
 cluster: cluster.o 
-	$(COMPILER) -shared -Wl,-soname,cluster.so -o cluster.so \
+	$(COMPILER) -shared -Wl,-soname,libhcluster.so -o libhcluster.so \
 	cluster.o   -lc	

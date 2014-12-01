@@ -2996,7 +2996,7 @@ when microarrays are being clustered.
   /* Calculate the distances and save them in the ragged array */
   for (i = 1; i < n; i++) {
     for (j = 0; j < i; j++) {
-      /*   matrix[i][j]=metric(ndata,data,data,mask,mask,weights,i,j,transpose); */
+      matrix[i][j]=metric(ndata,data,data,mask,mask,weights,i,j,transpose); /* this is a problem */
     }
   }
   return matrix;
@@ -3107,7 +3107,7 @@ weights array, the function returns NULL.
 
 /* ******************************************************************** */
 
-void cuttree (int nelements, Node* tree, int nclusters, int* clusterid)  /* int clusterid[] */
+void cuttree (int nelements, Node* tree, int nclusters, int clusterid[])  /* int clusterid[] */
 
 /*
 Purpose
@@ -3174,6 +3174,9 @@ error occured, all elements in clusterid are set to -1.
     if (k<0) nodeid[-k-1] = j; else clusterid[k] = j;
   }
   free(nodeid);
+  for(i =0;i<nelements;i++) {
+    printf("%d ",clusterid[i]);
+  }
   return;
 }
 
@@ -3336,7 +3339,6 @@ If a memory error occurs, pclcluster returns NULL.
   free(data);
   free(mask);
   free(distid);
- 
   return result;
 }
 
@@ -3843,14 +3845,36 @@ double** distmatrix=NULL;
 Node* result = NULL;
   const int nelements = (transpose==0) ? nrows : ncolumns;
   const int ldistmatrix = 1; /* (distmatrix==NULL && method!='s') ? 1 : 0; */
-
   if (nelements < 2) return NULL;
+
+
+  printf("about to go the distance\n");
+
   /* Calculate the distance matrix if the user didn't give it */
   if(ldistmatrix) {   
 distmatrix =
       distancematrix(nrows, ncolumns, data, mask, weight, dist, transpose);
     if (!distmatrix) return NULL; /* Insufficient memory */
   }
+
+  int i,j; 
+  printf("   Gene:");
+  for(i=0; i<nrows-1; i++) printf("%6d", i);
+  printf("\n");
+  for(i=0; i<nrows; i++)  {
+    printf("Gene %2d:",i);
+    for(j=0; j<i; j++) printf(" %5.2f",distmatrix[i][j]);
+    printf("\n");
+  }
+
+  /* int i,j; /\* erase these later *\/ */
+  /* for(i=0; i<nrows; i++)  {  */
+  /*   printf("Data %2d:",i); */
+  /*   for(j=0; j<i; j++) printf(" %5.2f",data[i][j]); */
+  /*   printf("\n"); */
+  /* } */
+  
+
   switch(method)
   { case 's':
       result = pslcluster(nrows, ncolumns, data, mask, weight, distmatrix,

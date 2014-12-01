@@ -28,7 +28,7 @@ treetst =: 3 : 0
  dist=.'e' 
  meth =. 's'
  data =. y
- wt =. (}.$ y) # 2.7 - 1.7
+ wt =. (}.$ y) $ 2.7 - 1.7
  mask =. 0 + isNum data
  'nr nc' =. $ data
  cmd=. LIBCLUST,' treeclusterj * x x *d *x *d x c c'
@@ -36,7 +36,47 @@ treetst =: 3 : 0
 )
 
 
+treetst2 =: 3 : 0
+ ('e';'s') treetst2 y
+:
+ 'dist meth' =. x
+ data =. y
+ wt =. (}.$ y) $ 2.7 - 1.7
+ mask =. 0 + isNum data
+ 'nr nc' =. $ data
+ cmd=. LIBCLUST,' treeclusterj * x x *d *x *d x c c'
+ 0 pick cmd cd nr;nc;data;mask;wt;0;dist;meth 
+)
 
+
+mymetric =: 4 : 0
+'i j'=.x
+ mask =. 0 + isNum y
+ n=. #y
+ wt=. n$ 2.7 -2.7
+ cmd=. LIBCLUST,' mymetric d c i *d *x *d i i'
+0 pick cmd cd 'e';n;y;mask;wt;i;j
+)
+
+
+euclid =: 4 : 0
+'i j'=.x
+ mask =. 0 + isNum y
+ n=. #y
+ wt=. n$ 2.7 -2.7
+ cmd=. LIBCLUST,' euclid d i *d *d *x *x *d i i i'
+0 pick cmd cd n;y;y;mask;mask;wt;i;j;0
+)
+
+
+euclid2 =: 4 : 0
+'i j'=.x
+ mask =. 0 + isNum y
+ n=. 4 NB.}.$ y
+ wt=. n$ 2.7 -2.7
+ cmd=. LIBCLUST,' euclid2 d *d i i i '
+0 pick cmd cd (,y);n;i;j
+)
 
 cuttree =: 3 : 0
  'nelements tree nclust'=.y
@@ -47,6 +87,12 @@ cuttree =: 3 : 0
 
 clusterdistance =: 4 : 0
 'data wt'
+)
+
+median=: 3 : 0
+n=.#y
+cmd=. LIBCLUST,' median d x *d'
+0 pick cmd cd n;y
 )
 
 NB. use like 'e' distancematrix data;wts

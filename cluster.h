@@ -91,3 +91,7 @@ double median (int n, double x[]);
 
 double* calculate_weights(int nrows, int ncolumns, double** data, int** mask,
   double weights[], int transpose, char dist, double cutoff, double exponent);
+
+double mymetric(char dist,int nc, double** data, int** mask,  double* weights, int i, int j);
+
+double euclid2(double** data, int nc, int i, int j);

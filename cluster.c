@@ -3812,7 +3812,6 @@ If a memory error occurs, treecluster returns NULL.
   { case 's':
       result = pslcluster(nrows, ncolumns, data, mask, weight, distmatrix,
                           dist, transpose);
-      printf("successful clustering\n");
       break;
     case 'm':
       result = pmlcluster(nelements, distmatrix);
@@ -3825,7 +3824,6 @@ If a memory error occurs, treecluster returns NULL.
                           dist, transpose);
       break;
   }
-  printf("about to free\n");
   /* Deallocate space for distance matrix, if it was allocated by treecluster */
   if(ldistmatrix)
   { int i;
@@ -3846,10 +3844,6 @@ Node* result = NULL;
   const int nelements = (transpose==0) ? nrows : ncolumns;
   const int ldistmatrix = 1; /* (distmatrix==NULL && method!='s') ? 1 : 0; */
   if (nelements < 2) return NULL;
-
-
-  printf("about to go the distance\n");
-
   /* Calculate the distance matrix if the user didn't give it */
   if(ldistmatrix) {   
 distmatrix =

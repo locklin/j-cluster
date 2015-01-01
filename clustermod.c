@@ -301,7 +301,6 @@ Otherwise, the distance between two columns in the matrix is calculated.
 { double result = 0.;
   double tweight = 0;
   int i;
-  printf("made it to euclid");
   if (transpose==0) /* Calculate the distance between two rows */
   { for (i = 0; i < n; i++)
     { if (mask1[index1][i] && mask2[index2][i])
@@ -1113,19 +1112,16 @@ when microarrays are being clustered.
     return NULL;
   }
   /* Calculate the distances and save them in the ragged array */
-  printf("about to go the distance again\n");
   for (i = 1; i < nrows; i++) {
     for (j = 0; j < i; j++) {
-      printf("i=%d,j=%d\n",i,j);
-      matrix[i][j]= euclid(ncolumns,data,data,mask,mask,weights,i,j,0);
-/*mymetric(dist,ncolumns,data,mask,weights,i,j); this is a problem */ 
+      matrix[i][j]= mymetric(dist,ncolumns,data,mask,weights,i,j); 
+/* euclid(ncolumns,data,data,mask,mask,weights,i,j,0); */
     }
   }
   return matrix;
 }
 
 double mymetric(char dist, int nc, double** data, int** mask,  double* weights, int i, int j) {
-  printf("boink");
   switch(dist) {
   case 'e': return euclid(nc,data,data,mask,mask,weights,i,j,0);
   case 'b': return cityblock(nc,data,data,mask,mask,weights,i,j,0);
@@ -1134,8 +1130,8 @@ double mymetric(char dist, int nc, double** data, int** mask,  double* weights, 
   case 'u': return ucorrelation(nc,data,data,mask,mask,weights,i,j,0);
   case 'x': return uacorrelation(nc,data,data,mask,mask,weights,i,j,0);
   case 's': return spearman(nc,data,data,mask,mask,weights,i,j,0);
-    case 'k': return kendall(nc,data,data,mask,mask,weights,i,j,0);
-    default: return euclid(nc,data,data,mask,mask,weights,i,j,0);
+  case 'k': return kendall(nc,data,data,mask,mask,weights,i,j,0);
+  default: return euclid(nc,data,data,mask,mask,weights,i,j,0);
   }
 }
 
@@ -1206,9 +1202,6 @@ error occured, all elements in clusterid are set to -1.
     if (k<0) nodeid[-k-1] = j; else clusterid[k] = j;
   }
   free(nodeid);
-  for(i =0;i<nelements;i++) {
-    printf("%d ",clusterid[i]);
-  }
   return;
 }
 
@@ -1749,25 +1742,20 @@ Node* result = NULL;
   const int nelements = (transpose==0) ? nrows : ncolumns;
   const int ldistmatrix = 1; /* (distmatrix==NULL && method!='s') ? 1 : 0; */
   if (nelements < 2) return NULL;
-
-
-
-
   /* Calculate the distance matrix if the user didn't give it */
 
-distmatrix =
-      distancematrix(nrows, ncolumns, data, mask, weight, dist, transpose);
+distmatrix = distancematrix(nrows, ncolumns, data, mask, weight, dist, transpose);
 
 
-  int i,j; 
-  printf("   Gene:");
-  for(i=0; i<nrows-1; i++) printf("%6d", i);
-  printf("\n");
-  for(i=0; i<nrows; i++)  {
-    printf("Gene %2d:",i);
-    for(j=0; j<i; j++) printf(" %5.2f",distmatrix[i][j]);
-    printf("\n");
-  }
+  /* int i,j;  */
+  /* printf("   Gene:"); */
+  /* for(i=0; i<nrows-1; i++) printf("%6d", i); */
+  /* printf("\n"); */
+  /* for(i=0; i<nrows; i++)  { */
+  /*   printf("Gene %2d:",i); */
+  /*   for(j=0; j<i; j++) printf(" %5.2f",distmatrix[i][j]); */
+  /*   printf("\n"); */
+  /* } */
 
   /* int i,j; /\* erase these later *\/ */
   /* for(i=0; i<nrows; i++)  {  */

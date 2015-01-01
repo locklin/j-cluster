@@ -11,13 +11,17 @@ end.
 )
 
 NB. creates mask
-isNum =: [: -. 128!:5 +. _ = ]
+masker =: 0 + [: -. 128!:5 +. _ = ]
+
+unDoub =: 3 : 0
+ (15!:14 <'y') +(8*{:$y)*i.{.$y
+)
 
 NB. Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
 NB.   double weight[], int transpose, char dist, char method, double** distmatrix);
 treecluster =: 4 : 0
  'data wt dist meth distmx' =. y
- mask =. isNum data
+ mask =. masker data
  'nr nc' =. $ data
  cmd=. LIBCLUST,' treecluster * x x *d *x *d x c c *d'
  0 pick cmd cd nr;nc;data;mask;wt;0;dist;meth;distmx 
@@ -25,14 +29,14 @@ treecluster =: 4 : 0
 
 
 treetst =: 3 : 0
- dist=.'e' 
- meth =. 's'
- data =. y
- wt =. (}.$ y) $ 2.7 - 1.7
- mask =. 0 + isNum data
- 'nr nc' =. $ data
- cmd=. LIBCLUST,' treeclusterj * x x *d *x *d x c c'
- 0 pick cmd cd nr;nc;data;mask;wt;0;dist;meth 
+ ('e';'s') treetst2 y
+:
+ 'dist meth' =. x
+ wt =. ({: $ y) $ 2.7 - 1.7
+ mask =. masker y
+ 'nr nc' =. $ y
+ cmd=. LIBCLUST,' treecluster * x x *x *x *d x c c *x'
+ 0 pick cmd cd nr;nc;(unDoub data);(unDoub mask);wt;0;dist;meth;''
 )
 
 
@@ -40,45 +44,35 @@ treetst2 =: 3 : 0
  ('e';'s') treetst2 y
 :
  'dist meth' =. x
- data =. y
- wt =. (}.$ y) $ 2.7 - 1.7
- mask =. 0 + isNum data
- 'nr nc' =. $ data
- cmd=. LIBCLUST,' treeclusterj * x x *d *x *d x c c'
- 0 pick cmd cd nr;nc;data;mask;wt;0;dist;meth 
+ wt =. ({: $ y) $ 2.7 - 1.7
+ mask =. masker y
+ 'nr nc' =. $ y
+ cmd=. LIBCLUST,' treeclusterj * x x *x *x *d x c c'
+ 0 pick cmd cd nr;nc;(unDoub y);(unDoub mask);wt;0;dist;meth 
 )
 
 
 mymetric =: 4 : 0
 'i j'=.x
- mask =. 0 + isNum y
+ mask =. masker y
  n=. #y
- wt=. n$ 2.7 -2.7
- cmd=. LIBCLUST,' mymetric d c i *d *x *d i i'
-0 pick cmd cd 'e';n;y;mask;wt;i;j
+ wt=. n$ 3.7 -2.7
+ cmd=. LIBCLUST,' mymetric d c i *x *x *d i i'
+0 pick cmd cd 'e';n;(unDoub y);(unDoub mask);wt;i;j
 )
 
-
-euclid =: 4 : 0
-'i j'=.x
- mask =. 0 + isNum y
- n=. #y
- wt=. n$ 2.7 -2.7
- cmd=. LIBCLUST,' euclid d i *d *d *x *x *d i i i'
-0 pick cmd cd n;y;y;mask;mask;wt;i;j;0
-)
 
 
 euclid2 =: 4 : 0
 'i j'=.x
- mask =. 0 + isNum y
- n=. 4 NB.}.$ y
- wt=. n$ 2.7 -2.7
- cmd=. LIBCLUST,' euclid2 d *d i i i '
-0 pick cmd cd (,y);n;i;j
+ mask =. masker y
+ n=. {:$ y 
+ wt=. n$ 3.7 -2.7
+ cmd=. LIBCLUST,' euclid2 d *x i i i '
+0 pick cmd cd (unDoub y);n;i;j
 )
 
-cuttree =: 3 : 0
+cutree =: 3 : 0
  'nelements tree nclust'=.y
  clustid =. nelements $ 0
  cmd=. LIBCLUST,' cuttree n x x x *i'
@@ -97,11 +91,11 @@ cmd=. LIBCLUST,' median d x *d'
 
 NB. use like 'e' distancematrix data;wts
 distancematrix=: 4 : 0
-'data wts' =. y
-mask=. isNum data
-'nr nc'=. $ data
-cmd=. LIBCLUST,' distancematrix *d x x *d *x *d c x'
-0 pick cmd cd nr;nc;data;mask;wts;x;0
+ 'data wts' =. y
+ mask=. masker data
+ 'nr nc'=. $ data
+ cmd=. LIBCLUST,' distancematrix *d x x *d *x *d c x'
+ 0 pick cmd cd nr;nc;data;mask;wts;x;0
 )
 
 

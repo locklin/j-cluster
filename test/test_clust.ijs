@@ -4,11 +4,17 @@ raw =. readcsv 'test/usarrests.csv'
 data =. > ". each }."1 }.raw
 rownames =. >0{"1 }.raw
 dist =. data euclidean data
-cutree 50;(('e';'a')treetst2 data);2
-cutree 50;(('e';'s')treetst2 data);2
+I.0=a=.cutree 50;(('e';'s')treetst data);2
 
+
+b=. 0.1 + (3 3) $ 0 1 2 0 3 8 1 2 3
+(b euclidean b)^0.5
+cutree 3;(('e';'s')treetst2  b);2
+cutree 3;(('e';'s')treetst  b);2
+('e';'s')treetst  0.1+b
 
 dat=: > ". each readcsv 'test/gene.csv'
+cutree 3;(('e';'s')treetst2  dat);2
 (1;0) euclid2 dat
 (1;0)mymetric dat
 

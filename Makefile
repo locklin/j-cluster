@@ -9,7 +9,7 @@ LIBPATH =
 
 
 
-all: clustermod
+all: cluster
 
 clean:
 	rm *.o *.so
@@ -19,6 +19,9 @@ dist:
 
 cluster.o: cluster.c
 	$(COMPILER) $(COPTS) cluster.o cluster.c  $(LIBS) $(CFLAGS)
+
+cluster2.o: cluster2.c
+	$(COMPILER) $(COPTS) cluster2.o cluster2.c  $(LIBS) $(CFLAGS)
 
 clustermod.o: clustermod.c
 	$(COMPILER) $(COPTS) clustermod.o clustermod.c  $(LIBS) $(CFLAGS)
@@ -31,4 +34,8 @@ cluster: cluster.o
 clustermod: clustermod.o 
 	$(COMPILER) -shared -Wl,-soname,libhcluster.so -o libhcluster.so \
 	clustermod.o -lc	
+
+cluster2: cluster2.o 
+	$(COMPILER) -shared -Wl,-soname,libhcluster.so -o libhcluster.so \
+	cluster2.o -lc	
 

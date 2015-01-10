@@ -11,44 +11,38 @@ end.
 )
 
 NB. creates mask
-masker =: 0 + [: -. 128!:5 +. _ = ]
+masker =: 0+ [: -. 128!:5 +. _ = ]
 
 unDoub =: 3 : 0
  (15!:14 <'y') +(8*{:$y)*i.{.$y
 )
 
-NB. Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
-NB.   double weight[], int transpose, char dist, char method, double** distmatrix);
-treecluster =: 4 : 0
- 'data wt dist meth distmx' =. y
- mask =. masker data
- 'nr nc' =. $ data
- cmd=. LIBCLUST,' treecluster * x x *d *x *d x c c *d'
- 0 pick cmd cd nr;nc;data;mask;wt;0;dist;meth;distmx 
-)
-
-
-treetst =: 3 : 0
- ('e';'s') treetst2 y
-:
- 'dist meth' =. x
- wt =. ({: $ y) $ 2.7 - 1.7
- mask =. masker y
- 'nr nc' =. $ y
- cmd=. LIBCLUST,' treecluster * x x *x *x *d x c c *x'
- 0 pick cmd cd nr;nc;(unDoub data);(unDoub mask);wt;0;dist;meth;''
+unDoub2 =: 3 : 0
+ yy =. 2 ic ,y
+ (15!:14 <'yy') +(4*{:$y)*i.{.$y
 )
 
 
 treetst2 =: 3 : 0
- ('e';'s') treetst2 y
+ ('e';'a') treetst2 y
+:
+ 'dist meth' =. x
+ wt =. ({: $ y) $ 0.5 NB.1.7 - 1.7
+ mask =. ,masker2 y
+ 'nr nc' =. $ y
+ cmd=. LIBCLUST,' treeclusterj * x x *x *x *d i c c'
+ 0 pick cmd cd nr;nc;(unDoub y);(unDoub2 mask);wt;0;dist;meth 
+)
+
+treetst =: 3 : 0
+ ('e';'s') treetst y
 :
  'dist meth' =. x
  wt =. ({: $ y) $ 2.7 - 1.7
- mask =. masker y
+ mask =.  masker y
  'nr nc' =. $ y
- cmd=. LIBCLUST,' treeclusterj * x x *x *x *d x c c'
- 0 pick cmd cd nr;nc;(unDoub y);(unDoub mask);wt;0;dist;meth 
+ cmd=. LIBCLUST,' treecluster * x x *x *x *d x c c *x'
+ 0 pick cmd cd nr;nc;(unDoub y); (unDoub2 mask) ;wt;0;dist;meth;''
 )
 
 

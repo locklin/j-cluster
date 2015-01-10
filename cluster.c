@@ -980,7 +980,6 @@ Otherwise, the distance between two columns in the matrix is calculated.
 { double result = 0.;
   double tweight = 0;
   int i;
-  printf("made it to euclid");
   if (transpose==0) /* Calculate the distance between two rows */
   { for (i = 0; i < n; i++)
     { if (mask1[index1][i] && mask2[index2][i])
@@ -2994,11 +2993,16 @@ when microarrays are being clustered.
     return NULL;
   }
   /* Calculate the distances and save them in the ragged array */
-  for (i = 1; i < n; i++) {
-    for (j = 0; j < i; j++) {
-      matrix[i][j]=metric(ndata,data,data,mask,mask,weights,i,j,transpose); /* this is a problem */
-    }
-  }
+  /* for (i = 1; i < n; i++) { */
+  /*   for (j = 0; j < i; j++) { */
+  /*     matrix[i][j]=metric(ndata,data,data,mask,mask,weights,i,j,transpose); /\* this is a problem *\/ */
+  /*   } */
+  /* } */
+
+   for (i = 1; i < n; i++)
+     for (j = 0; j < i; j++)
+       matrix[i][j]=metric(ndata,data,data,mask,mask,weights,i,j,transpose);
+
   return matrix;
 }
 
@@ -3718,7 +3722,7 @@ If a memory error occurs, palcluster returns NULL.
 /* ******************************************************************* */
 
 Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
-  double weight[], int transpose, char dist, char method, double** distmatrix)
+		   double weight[], int transpose, char dist, char method, double** distmatrix) 
 /*
 Purpose
 =======
@@ -3797,7 +3801,9 @@ If a memory error occurs, treecluster returns NULL.
 
 ========================================================================
 */
-{ Node* result = NULL;
+{ 
+  /*  double** distmatrix=NULL; */
+  Node* result = NULL;
   const int nelements = (transpose==0) ? nrows : ncolumns;
   const int ldistmatrix = (distmatrix==NULL && method!='s') ? 1 : 0;
 
@@ -3808,66 +3814,23 @@ If a memory error occurs, treecluster returns NULL.
       distancematrix(nrows, ncolumns, data, mask, weight, dist, transpose);
     if (!distmatrix) return NULL; /* Insufficient memory */
   }
-  switch(method)
-  { case 's':
-      result = pslcluster(nrows, ncolumns, data, mask, weight, distmatrix,
-                          dist, transpose);
-      break;
-    case 'm':
-      result = pmlcluster(nelements, distmatrix);
-      break;
-    case 'a':
-      result = palcluster(nelements, distmatrix);
-      break;
-    case 'c':
-      result = pclcluster(nrows, ncolumns, data, mask, weight, distmatrix,
-                          dist, transpose);
-      break;
-  }
-  /* Deallocate space for distance matrix, if it was allocated by treecluster */
-  if(ldistmatrix)
-  { int i;
-    for (i = 1; i < nelements; i++) free(distmatrix[i]);
-    free (distmatrix);
-  }
-  return result;
-}
 
 
 
+  /* int i,j; /\* erase these later *\/ */
+  /* for(i=0; i<nrows; i++)  { */
+  /*   printf("Data %2d:",i); */
+  /*   for(j=0; j<ncolumns; j++) printf("val=%5.2f  ",i,j,data[i][j]); */
+  /*   printf("\n"); */
+  /* } */
 
-Node* treeclusterj (int nrows, int ncolumns, double** data, int** mask,
-  double weight[], int transpose, char dist, char method)
-{ 
-double** distmatrix=NULL;
-Node* result = NULL;
-  const int nelements = (transpose==0) ? nrows : ncolumns;
-  const int ldistmatrix = 1; /* (distmatrix==NULL && method!='s') ? 1 : 0; */
-  if (nelements < 2) return NULL;
-  /* Calculate the distance matrix if the user didn't give it */
-  if(ldistmatrix) {   
-distmatrix =
-      distancematrix(nrows, ncolumns, data, mask, weight, dist, transpose);
-    if (!distmatrix) return NULL; /* Insufficient memory */
-  }
-
-  int i,j; 
-  printf("   Gene:");
-  for(i=0; i<nrows-1; i++) printf("%6d", i);
-  printf("\n");
+  int i,j; /* erase these later */
   for(i=0; i<nrows; i++)  {
-    printf("Gene %2d:",i);
-    for(j=0; j<i; j++) printf(" %5.2f",distmatrix[i][j]);
+    printf("Data %2d:",i);
+    for(j=0; j<ncolumns; j++) printf("val=%d  ",mask[i][j]);
     printf("\n");
   }
 
-  /* int i,j; /\* erase these later *\/ */
-  /* for(i=0; i<nrows; i++)  {  */
-  /*   printf("Data %2d:",i); */
-  /*   for(j=0; j<i; j++) printf(" %5.2f",data[i][j]); */
-  /*   printf("\n"); */
-  /* } */
-  
 
   switch(method)
   { case 's':
@@ -3886,6 +3849,17 @@ distmatrix =
       break;
   }
   /* Deallocate space for distance matrix, if it was allocated by treecluster */
+
+  /* int i,j; */
+  /* printf("   Gene:"); */
+  /* for(i=0; i<nrows-1; i++) printf("%6d", i); */
+  /* printf("\n"); */
+  /* for(i=0; i<nrows; i++) */
+  /*   { printf("Gene %2d:",i); */
+  /*   for(j=0; j<i; j++) printf(" %5.2f",distmatrix[i][j]); */
+  /*   printf("\n"); */
+  /* } */
+
   if(ldistmatrix)
   { int i;
     for (i = 1; i < nelements; i++) free(distmatrix[i]);
@@ -3893,6 +3867,8 @@ distmatrix =
   }
   return result;
 }
+
+
 
 /* ******************************************************************* */
 

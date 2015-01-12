@@ -229,9 +229,8 @@ static double* getrank (int n, double data[])
 
 /* ---------------------------------------------------------------------- */
 
-static int
-makedatamask(int nrows, int ncols, double*** pdata, int*** pmask)
-{ int i;
+static int makedatamask(int nrows, int ncols, double*** pdata, int*** pmask) {
+  int i;
   double** data;
   int** mask;
   data = malloc(nrows*sizeof(double*));
@@ -269,11 +268,10 @@ makedatamask(int nrows, int ncols, double*** pdata, int*** pmask)
 
 /* ---------------------------------------------------------------------- */
 
-static void
-freedatamask(int n, double** data, int** mask)
-{ int i;
-  for (i = 0; i < n; i++)
-  { free(mask[i]);
+static void freedatamask(int n, double** data, int** mask) {
+  int i;
+  for (i = 0; i < n; i++) {
+    free(mask[i]);
     free(data[i]);
   }
   free(mask);
@@ -281,10 +279,21 @@ freedatamask(int n, double** data, int** mask)
 }
 
 /* ---------------------------------------------------------------------- */
+static int freedistmx(int n, double** dist)
+{
+  int i;
+  for (i = 1; i < n; i++) {
+    free(dist[i]);
+  }
+  free (dist);
+  return 1;
+}
+/* ---------------------------------------------------------------------- */
 
-static
-double find_closest_pair(int n, double** distmatrix, int* ip, int* jp)
+
 /*
+static double find_closest_pair(int n, double** distmatrix, int* ip, int* jp)
+
 This function searches the distance matrix to find the pair with the shortest
 distance between them. The indices of the pair are returned in ip and jp; the
 distance itself is returned by the function.
@@ -304,7 +313,8 @@ jp         (output) int*
 A pointer to the integer that is to receive the second index of the pair with
 the shortest distance.
 */
-{ int i, j;
+static double find_closest_pair(int n, double** distmatrix, int* ip, int* jp) { 
+  int i, j;
   double temp;
   double distance = distmatrix[1][0];
   *ip = 1;
@@ -324,8 +334,10 @@ the shortest distance.
 
 /* ********************************************************************* */
 
-static int svd(int m, int n, double** u, double w[], double** vt)
+
 /*
+
+  static int svd(int m, int n, double** u, double w[], double** vt)
  *   This subroutine is a translation of the Algol procedure svd,
  *   Num. Math. 14, 403-420(1970) by Golub and Reinsch.
  *   Handbook for Auto. Comp., Vol II-Linear Algebra, 134-151(1971).
@@ -389,7 +401,8 @@ static int svd(int m, int n, double** u, double w[], double** vt)
  *       argument. If the allocation fails, svd returns -1.
  *   2003.06.05
  */
-{ int i, j, k, i1, k1, l1, its;
+static int svd(int m, int n, double** u, double w[], double** vt){ 
+  int i, j, k, i1, k1, l1, its;
   double c,f,h,s,x,y,z;
   int l = 0;
   int ierr = 0;
@@ -806,8 +819,9 @@ static int svd(int m, int n, double** u, double w[], double** vt)
 
 /* ********************************************************************* */
 
-int pca(int nrows, int ncolumns, double** u, double** v, double* w)
+
 /*
+int pca(int nrows, int ncolumns, double** u, double** v, double* w)
 Purpose
 =======
 
@@ -864,7 +878,7 @@ eigenvalues appearing first.
 The function returns 0 if successful, -1 if memory allocation fails, and a
 positive integer if the singular value decomposition fails to converge.
 */
-{
+int pca(int nrows, int ncolumns, double** u, double** v, double* w){
     int i;
     int j;
     int error;
@@ -930,11 +944,11 @@ positive integer if the singular value decomposition fails to converge.
 
 /* ********************************************************************* */
 
-static
-double euclid (int n, double** data1, double** data2, int** mask1, int** mask2,
-  const double weight[], int index1, int index2, int transpose)
  
 /*
+static double euclid (int n, double** data1, double** data2, int** mask1, int** mask2,
+  const double weight[], int index1, int index2, int transpose)
+
 Purpose
 =======
 
@@ -977,22 +991,24 @@ Otherwise, the distance between two columns in the matrix is calculated.
 
 ============================================================================
 */
-{ double result = 0.;
+static double euclid (int n, double** data1, double** data2, int** mask1, 
+		      int** mask2, const double weight[], int index1, int index2, 
+		      int transpose){ 
+  double result = 0.;
   double tweight = 0;
   int i;
-  if (transpose==0) /* Calculate the distance between two rows */
-  { for (i = 0; i < n; i++)
-    { if (mask1[index1][i] && mask2[index2][i])
-      { double term = data1[index1][i] - data2[index2][i];
+  if (transpose==0) { /* Calculate the distance between two rows */
+    for (i = 0; i < n; i++) {
+      if (mask1[index1][i] && mask2[index2][i]) {
+	double term = data1[index1][i] - data2[index2][i];
         result += weight[i]*term*term;
         tweight += weight[i];
       }
     }
-  }
-  else
-  { for (i = 0; i < n; i++)
-    { if (mask1[i][index1] && mask2[i][index2])
-      { double term = data1[i][index1] - data2[i][index2];
+  }   else  { 
+    for (i = 0; i < n; i++) { 
+      if (mask1[i][index1] && mask2[i][index2]) { 
+	double term = data1[i][index1] - data2[i][index2];
         result += weight[i]*term*term;
         tweight += weight[i];
       }
@@ -1005,70 +1021,39 @@ Otherwise, the distance between two columns in the matrix is calculated.
 
 /* ********************************************************************* */
 
-static
-double cityblock (int n, double** data1, double** data2, int** mask1,
+/*
+
+static double cityblock (int n, double** data1, double** data2, int** mask1,
   int** mask2, const double weight[], int index1, int index2, int transpose)
 
-/*
 Purpose
 =======
-
 The cityblock routine calculates the weighted "City Block" distance between
 two rows or columns in a matrix. City Block distance is defined as the
 absolute value of X1-X2 plus the absolute value of Y1-Y2 plus..., which is
 equivalent to taking an "up and over" path.
 
-Arguments
-=========
-
-n      (input) int
-The number of elements in a row or column. If transpose==0, then n is the number
-of columns; otherwise, n is the number of rows.
-
-data1  (input) double array
-The data array containing the first vector.
-
-data2  (input) double array
-The data array containing the second vector.
-
-mask1  (input) int array
-This array which elements in data1 are missing. If mask1[i][j]==0, then
-data1[i][j] is missing.
-
-mask2  (input) int array
-This array which elements in data2 are missing. If mask2[i][j]==0, then
-data2[i][j] is missing.
-
-weight (input) double[n]
-The weights that are used to calculate the distance.
-
-index1     (input) int
-Index of the first row or column.
-
-index2     (input) int
-Index of the second row or column.
-
-transpose (input) int
-If transpose==0, the distance between two rows in the matrix is calculated.
-Otherwise, the distance between two columns in the matrix is calculated.
+Arguments (same as above)
 
 ============================================================================ */
-{ double result = 0.;
+static double cityblock (int n, double** data1, double** data2, int** mask1,
+			 int** mask2, const double weight[], int index1, int index2, 
+			 int transpose) { 
+double result = 0.;
   double tweight = 0;
   int i;
-  if (transpose==0) /* Calculate the distance between two rows */
-  { for (i = 0; i < n; i++)
-    { if (mask1[index1][i] && mask2[index2][i])
-      { double term = data1[index1][i] - data2[index2][i];
+  if (transpose==0) {    /* Calculate the distance between two rows */
+    for (i = 0; i < n; i++) {
+      if (mask1[index1][i] && mask2[index2][i]) {
+	double term = data1[index1][i] - data2[index2][i];
         result = result + weight[i]*fabs(term);
         tweight += weight[i];
       }
     }
-  }
-  else
-  { for (i = 0; i < n; i++)
-    { if (mask1[i][index1] && mask2[i][index2])
-      { double term = data1[i][index1] - data2[i][index2];
+  }  else  { 
+    for (i = 0; i < n; i++) {
+      if (mask1[i][index1] && mask2[i][index2]) {
+	double term = data1[i][index1] - data2[i][index2];
         result = result + weight[i]*fabs(term);
         tweight += weight[i];
       }
@@ -1081,10 +1066,12 @@ Otherwise, the distance between two columns in the matrix is calculated.
 
 /* ********************************************************************* */
 
+/*
+
 static
 double correlation (int n, double** data1, double** data2, int** mask1,
   int** mask2, const double weight[], int index1, int index2, int transpose)
-/*
+
 Purpose
 =======
 
@@ -1097,50 +1084,23 @@ but the triangular inequality d(a,b) + d(b,c) >= d(a,c) does not hold
 
 Arguments
 =========
-
-n      (input) int
-The number of elements in a row or column. If transpose==0, then n is the number
-of columns; otherwise, n is the number of rows.
-
-data1  (input) double array
-The data array containing the first vector.
-
-data2  (input) double array
-The data array containing the second vector.
-
-mask1  (input) int array
-This array which elements in data1 are missing. If mask1[i][j]==0, then
-data1[i][j] is missing.
-
-mask2  (input) int array
-This array which elements in data2 are missing. If mask2[i][j]==0, then
-data2[i][j] is missing.
-
-weight (input) double[n]
-The weights that are used to calculate the distance.
-
-index1     (input) int
-Index of the first row or column.
-
-index2     (input) int
-Index of the second row or column.
-
-transpose (input) int
-If transpose==0, the distance between two rows in the matrix is calculated.
-Otherwise, the distance between two columns in the matrix is calculated.
+(same as above)
 ============================================================================
 */
-{ double result = 0.;
+static double correlation (int n, double** data1, double** data2, int** mask1,
+		    int** mask2, const double weight[], int index1, int index2, 
+		    int transpose) { 
+  double result = 0.;
   double sum1 = 0.;
   double sum2 = 0.;
   double denom1 = 0.;
   double denom2 = 0.;
   double tweight = 0.;
-  if (transpose==0) /* Calculate the distance between two rows */
-  { int i;
-    for (i = 0; i < n; i++)
-    { if (mask1[index1][i] && mask2[index2][i])
-      { double term1 = data1[index1][i];
+  int i;
+  if (transpose==0) { /* Calculate the distance between two rows */
+    for (i = 0; i < n; i++) {
+      if (mask1[index1][i] && mask2[index2][i]) {
+	double term1 = data1[index1][i];
         double term2 = data2[index2][i];
         double w = weight[i];
         sum1 += w*term1;
@@ -1151,12 +1111,10 @@ Otherwise, the distance between two columns in the matrix is calculated.
         tweight += w;
       }
     }
-  }
-  else
-  { int i;
-    for (i = 0; i < n; i++)
-    { if (mask1[i][index1] && mask2[i][index2])
-      { double term1 = data1[i][index1];
+  }  else {
+    for (i = 0; i < n; i++) {
+      if (mask1[i][index1] && mask2[i][index2]) {
+       double term1 = data1[i][index1];
         double term2 = data2[i][index2];
         double w = weight[i];
         sum1 += w*term1;
@@ -1181,10 +1139,11 @@ Otherwise, the distance between two columns in the matrix is calculated.
 
 /* ********************************************************************* */
 
-static
-double acorrelation (int n, double** data1, double** data2, int** mask1,
-  int** mask2, const double weight[], int index1, int index2, int transpose)
+
 /*
+static double acorrelation (int n, double** data1, double** data2, int** mask1,
+			    int** mask2, const double weight[], int index1, int index2, 
+			    int transpose)
 Purpose
 =======
 
@@ -1194,52 +1153,24 @@ This definition yields a semi-metric: d(a,b) >= 0, and d(a,b) = 0 iff a = b.
 but the triangular inequality d(a,b) + d(b,c) >= d(a,c) does not hold
 (e.g., choose b = a + c).
 
-Arguments
-=========
+Arguments (same as above)
 
-n      (input) int
-The number of elements in a row or column. If transpose==0, then n is the number
-of columns; otherwise, n is the number of rows.
-
-data1  (input) double array
-The data array containing the first vector.
-
-data2  (input) double array
-The data array containing the second vector.
-
-mask1  (input) int array
-This array which elements in data1 are missing. If mask1[i][j]==0, then
-data1[i][j] is missing.
-
-mask2  (input) int array
-This array which elements in data2 are missing. If mask2[i][j]==0, then
-data2[i][j] is missing.
-
-weight (input) double[n]
-The weights that are used to calculate the distance.
-
-index1     (input) int
-Index of the first row or column.
-
-index2     (input) int
-Index of the second row or column.
-
-transpose (input) int
-If transpose==0, the distance between two rows in the matrix is calculated.
-Otherwise, the distance between two columns in the matrix is calculated.
 ============================================================================
 */
-{ double result = 0.;
+static double acorrelation (int n, double** data1, double** data2, int** mask1,
+			    int** mask2, const double weight[], int index1, int index2, 
+			    int transpose){ 
+  double result = 0.;
   double sum1 = 0.;
   double sum2 = 0.;
   double denom1 = 0.;
   double denom2 = 0.;
   double tweight = 0.;
-  if (transpose==0) /* Calculate the distance between two rows */
-  { int i;
-    for (i = 0; i < n; i++)
-    { if (mask1[index1][i] && mask2[index2][i])
-      { double term1 = data1[index1][i];
+  int i;
+  if (transpose==0) { /* Calculate the distance between two rows */
+    for (i = 0; i < n; i++) {
+      if (mask1[index1][i] && mask2[index2][i]) {
+	double term1 = data1[index1][i];
         double term2 = data2[index2][i];
         double w = weight[i];
         sum1 += w*term1;
@@ -1250,12 +1181,10 @@ Otherwise, the distance between two columns in the matrix is calculated.
         tweight += w;
       }
     }
-  }
-  else
-  { int i;
-    for (i = 0; i < n; i++)
-    { if (mask1[i][index1] && mask2[i][index2])
-      { double term1 = data1[i][index1];
+  }   else   { 
+    for (i = 0; i < n; i++) {
+      if (mask1[i][index1] && mask2[i][index2]) {
+	double term1 = data1[i][index1];
         double term2 = data2[i][index2];
         double w = weight[i];
         sum1 += w*term1;
@@ -1280,9 +1209,9 @@ Otherwise, the distance between two columns in the matrix is calculated.
 
 /* ********************************************************************* */
 
-static
-double ucorrelation (int n, double** data1, double** data2, int** mask1,
-  int** mask2, const double weight[], int index1, int index2, int transpose)
+/* static */
+/* double ucorrelation (int n, double** data1, double** data2, int** mask1, */
+/*   int** mask2, const double weight[], int index1, int index2, int transpose) */
 /*
 Purpose
 =======
@@ -1295,53 +1224,25 @@ This definition yields a semi-metric: d(a,b) >= 0, and d(a,b) = 0 iff a = b.
 but the triangular inequality d(a,b) + d(b,c) >= d(a,c) does not hold
 (e.g., choose b = a + c).
 
-Arguments
-=========
+Arguments (same as above)
 
-n      (input) int
-The number of elements in a row or column. If transpose==0, then n is the number
-of columns; otherwise, n is the number of rows.
-
-data1  (input) double array
-The data array containing the first vector.
-
-data2  (input) double array
-The data array containing the second vector.
-
-mask1  (input) int array
-This array which elements in data1 are missing. If mask1[i][j]==0, then
-data1[i][j] is missing.
-
-mask2  (input) int array
-This array which elements in data2 are missing. If mask2[i][j]==0, then
-data2[i][j] is missing.
-
-weight (input) double[n]
-The weights that are used to calculate the distance.
-
-index1     (input) int
-Index of the first row or column.
-
-index2     (input) int
-Index of the second row or column.
-
-transpose (input) int
-If transpose==0, the distance between two rows in the matrix is calculated.
-Otherwise, the distance between two columns in the matrix is calculated.
 ============================================================================
 */
-{ double result = 0.;
+static double ucorrelation (int n, double** data1, double** data2, int** mask1,
+			    int** mask2, const double weight[], int index1, int index2, 
+			    int transpose){ 
+  int i;
+  double result = 0.;
   double denom1 = 0.;
   double denom2 = 0.;
   int flag = 0;
   /* flag will remain zero if no nonzero combinations of mask1 and mask2 are
    * found.
    */
-  if (transpose==0) /* Calculate the distance between two rows */
-  { int i;
-    for (i = 0; i < n; i++)
-    { if (mask1[index1][i] && mask2[index2][i])
-      { double term1 = data1[index1][i];
+  if (transpose==0)  {   /* Calculate the distance between two rows */
+    for (i = 0; i < n; i++)    { 
+      if (mask1[index1][i] && mask2[index2][i]) {
+       double term1 = data1[index1][i];
         double term2 = data2[index2][i];
         double w = weight[i];
         result += w*term1*term2;
@@ -1350,12 +1251,10 @@ Otherwise, the distance between two columns in the matrix is calculated.
         flag = 1;
       }
     }
-  }
-  else
-  { int i;
-    for (i = 0; i < n; i++)
-    { if (mask1[i][index1] && mask2[i][index2])
-      { double term1 = data1[i][index1];
+  }  else  { 
+    for (i = 0; i < n; i++) {
+      if (mask1[i][index1] && mask2[i][index2]) {
+	double term1 = data1[i][index1];
         double term2 = data2[i][index2];
         double w = weight[i];
         result += w*term1*term2;
@@ -1366,7 +1265,7 @@ Otherwise, the distance between two columns in the matrix is calculated.
     }
   }
   if (!flag) return 0.;
-  if (denom1==0.) return 1.;
+  if (denom1==0.) return 1.;   /* these should be altered SCL */
   if (denom2==0.) return 1.;
   result = result / sqrt(denom1*denom2);
   result = 1. - result;
@@ -1375,9 +1274,9 @@ Otherwise, the distance between two columns in the matrix is calculated.
 
 /* ********************************************************************* */
 
-static
-double uacorrelation (int n, double** data1, double** data2, int** mask1,
-  int** mask2, const double weight[], int index1, int index2, int transpose)
+/* static */
+/* double uacorrelation (int n, double** data1, double** data2, int** mask1, */
+/*   int** mask2, const double weight[], int index1, int index2, int transpose) */
 /*
 Purpose
 =======
@@ -1390,53 +1289,25 @@ This definition yields a semi-metric: d(a,b) >= 0, and d(a,b) = 0 iff a = b.
 but the triangular inequality d(a,b) + d(b,c) >= d(a,c) does not hold
 (e.g., choose b = a + c).
 
-Arguments
-=========
+Arguments (same as above)
 
-n      (input) int
-The number of elements in a row or column. If transpose==0, then n is the number
-of columns; otherwise, n is the number of rows.
-
-data1  (input) double array
-The data array containing the first vector.
-
-data2  (input) double array
-The data array containing the second vector.
-
-mask1  (input) int array
-This array which elements in data1 are missing. If mask1[i][j]==0, then
-data1[i][j] is missing.
-
-mask2  (input) int array
-This array which elements in data2 are missing. If mask2[i][j]==0, then
-data2[i][j] is missing.
-
-weight (input) double[n]
-The weights that are used to calculate the distance.
-
-index1     (input) int
-Index of the first row or column.
-
-index2     (input) int
-Index of the second row or column.
-
-transpose (input) int
-If transpose==0, the distance between two rows in the matrix is calculated.
-Otherwise, the distance between two columns in the matrix is calculated.
 ============================================================================
 */
-{ double result = 0.;
+static double uacorrelation (int n, double** data1, double** data2, int** mask1,
+			     int** mask2, const double weight[], int index1, int index2, 
+			     int transpose) {
+  int i;
+  double result = 0.;
   double denom1 = 0.;
   double denom2 = 0.;
   int flag = 0;
   /* flag will remain zero if no nonzero combinations of mask1 and mask2 are
    * found.
    */
-  if (transpose==0) /* Calculate the distance between two rows */
-  { int i;
-    for (i = 0; i < n; i++)
-    { if (mask1[index1][i] && mask2[index2][i])
-      { double term1 = data1[index1][i];
+  if (transpose==0)   { /* Calculate the distance between two rows */
+    for (i = 0; i < n; i++)    { 
+      if (mask1[index1][i] && mask2[index2][i])  { 
+	double term1 = data1[index1][i];
         double term2 = data2[index2][i];
         double w = weight[i];
         result += w*term1*term2;
@@ -1445,12 +1316,10 @@ Otherwise, the distance between two columns in the matrix is calculated.
         flag = 1;
       }
     }
-  }
-  else
-  { int i;
-    for (i = 0; i < n; i++)
-    { if (mask1[i][index1] && mask2[i][index2])
-      { double term1 = data1[i][index1];
+  }  else  { 
+    for (i = 0; i < n; i++) {
+      if (mask1[i][index1] && mask2[i][index2]) {
+	double term1 = data1[i][index1];
         double term2 = data2[i][index2];
         double w = weight[i];
         result += w*term1*term2;
@@ -1470,9 +1339,9 @@ Otherwise, the distance between two columns in the matrix is calculated.
 
 /* *********************************************************************  */
 
-static
-double spearman (int n, double** data1, double** data2, int** mask1,
-  int** mask2, const double weight[], int index1, int index2, int transpose)
+/* static */
+/* double spearman (int n, double** data1, double** data2, int** mask1, */
+/*   int** mask2, const double weight[], int index1, int index2, int transpose) */
 /*
 Purpose
 =======
@@ -1517,7 +1386,10 @@ If transpose==0, the distance between two rows in the matrix is calculated.
 Otherwise, the distance between two columns in the matrix is calculated.
 ============================================================================
 */
-{ int i;
+static double spearman (int n, double** data1, double** data2, int** mask1,
+			int** mask2, const double weight[], int index1, int index2, 
+			int transpose)  {
+  int i;
   int m = 0;
   double* rank1;
   double* rank2;
@@ -1528,50 +1400,49 @@ Otherwise, the distance between two columns in the matrix is calculated.
   double* tdata1;
   double* tdata2;
   tdata1 = malloc(n*sizeof(double));
-  if(!tdata1) return 0.0; /* Memory allocation error */
+  if(!tdata1) return 0.0;                        /* Memory allocation error */
   tdata2 = malloc(n*sizeof(double));
-  if(!tdata2) /* Memory allocation error */
-  { free(tdata1);
+  if(!tdata2) {                                     /* Memory allocation error */  
+    free(tdata1);
     return 0.0;
   }
-  if (transpose==0)
-  { for (i = 0; i < n; i++)
-    { if (mask1[index1][i] && mask2[index2][i])
-      { tdata1[m] = data1[index1][i];
+  if (transpose==0) {
+    for (i = 0; i < n; i++) {
+      if (mask1[index1][i] && mask2[index2][i]) {
+	tdata1[m] = data1[index1][i];
         tdata2[m] = data2[index2][i];
         m++;
       }
     }
-  }
-  else
-  { for (i = 0; i < n; i++)
-    { if (mask1[i][index1] && mask2[i][index2])
-      { tdata1[m] = data1[i][index1];
+  }   else  { 
+    for (i = 0; i < n; i++)  { 
+      if (mask1[i][index1] && mask2[i][index2]) {
+       tdata1[m] = data1[i][index1];
         tdata2[m] = data2[i][index2];
         m++;
       }
     }
   }
-  if (m==0)
-  { free(tdata1);
+  if (m==0) {
+    free(tdata1);
     free(tdata2);
     return 0;
   }
   rank1 = getrank(m, tdata1);
   free(tdata1);
-  if(!rank1)
-  { free(tdata2);
+  if(!rank1) { 
+    free(tdata2);
     return 0.0; /* Memory allocation error */
   }
   rank2 = getrank(m, tdata2);
   free(tdata2);
-  if(!rank2) /* Memory allocation error */
-  { free(rank1);
+  if(!rank2) { /* Memory allocation error */
+   free(rank1);
     return 0.0;
   }
   avgrank = 0.5*(m-1); /* Average rank */
-  for (i = 0; i < m; i++)
-  { const double value1 = rank1[i];
+  for (i = 0; i < m; i++) {
+    const double value1 = rank1[i];
     const double value2 = rank2[i];
     result += value1 * value2;
     denom1 += value1 * value1;
@@ -1596,55 +1467,25 @@ Otherwise, the distance between two columns in the matrix is calculated.
   return result;
 }
 
+
 /* *********************************************************************  */
 
-static
-double kendall (int n, double** data1, double** data2, int** mask1, int** mask2,
-  const double weight[], int index1, int index2, int transpose)
-/*
+/*  static double kendall (int n, double** data1, double** data2, int** mask1, 
+    int** mask2,  const double weight[], int index1, int index2, int transpose)
 Purpose
 =======
 
 The kendall routine calculates the Kendall distance between two
 rows or columns. The Kendall distance is defined as one minus Kendall's tau.
 
-Arguments
-=========
+Arguments (same as elsewhere)
 
-n      (input) int
-The number of elements in a row or column. If transpose==0, then n is the number
-of columns; otherwise, n is the number of rows.
-
-data1  (input) double array
-The data array containing the first vector.
-
-data2  (input) double array
-The data array containing the second vector.
-
-mask1  (input) int array
-This array which elements in data1 are missing. If mask1[i][j]==0, then
-data1[i][j] is missing.
-
-mask2  (input) int array
-This array which elements in data2 are missing. If mask2[i][j]==0, then
-data2[i][j] is missing.
-
-weight (input) double[n]
-These weights are ignored, but included for consistency with other distance
-measures.
-
-index1     (input) int
-Index of the first row or column.
-
-index2     (input) int
-Index of the second row or column.
-
-transpose (input) int
-If transpose==0, the distance between two rows in the matrix is calculated.
-Otherwise, the distance between two columns in the matrix is calculated.
 ============================================================================
 */
-{ int con = 0;
+static double kendall (int n, double** data1, double** data2, int** mask1, 
+		       int** mask2, const double weight[], int index1, int index2, 
+		       int transpose) {
+  int con = 0;
   int dis = 0;
   int exx = 0;
   int exy = 0;
@@ -1656,12 +1497,12 @@ Otherwise, the distance between two columns in the matrix is calculated.
   double denomy;
   double tau;
   int i, j;
-  if (transpose==0)
-  { for (i = 0; i < n; i++)
-    { if (mask1[index1][i] && mask2[index2][i])
-      { for (j = 0; j < i; j++)
-        { if (mask1[index1][j] && mask2[index2][j])
-          { double x1 = data1[index1][i];
+  if (transpose==0)  { 
+    for (i = 0; i < n; i++) {
+      if (mask1[index1][i] && mask2[index2][i]) {
+	for (j = 0; j < i; j++) {
+	  if (mask1[index1][j] && mask2[index2][j]) {
+	    double x1 = data1[index1][i];
             double x2 = data1[index1][j];
             double y1 = data2[index2][i];
             double y2 = data2[index2][j];
@@ -1676,13 +1517,12 @@ Otherwise, the distance between two columns in the matrix is calculated.
         }
       }
     }
-  }
-  else
-  { for (i = 0; i < n; i++)
-    { if (mask1[i][index1] && mask2[i][index2])
-      { for (j = 0; j < i; j++)
-        { if (mask1[j][index1] && mask2[j][index2])
-          { double x1 = data1[i][index1];
+  } else { 
+    for (i = 0; i < n; i++) {
+      if (mask1[i][index1] && mask2[i][index2]) {
+	for (j = 0; j < i; j++) {
+	  if (mask1[j][index1] && mask2[j][index2]) {
+           double x1 = data1[i][index1];
             double x2 = data1[j][index1];
             double y1 = data2[i][index2];
             double y2 = data2[j][index2];
@@ -1708,19 +1548,133 @@ Otherwise, the distance between two columns in the matrix is calculated.
 }
 
 /* *********************************************************************  */
+/*
+static double angle(int n, double** data1, double** data2, int** mask1, int** mask2,
+		    const double weight[],int index1, int index2, int transpose){
+Purpose
+=======
+
+The angle routine calculates the angular distance between two
+rows or columns; aka angle(x,y) = arccos(x . y /(|x| |y|) )
+
+Arguments (same as elsewhere)
+
+*/
+
+static double angle(int n, double** data1, double** data2, int** mask1, int** mask2,
+		    const double weight[],int index1, int index2, int transpose){
+  double ang;
+  double xx = 0;
+  double yy = 0;
+  double xdoty = 0;
+  int i;
+  if (transpose==0)  { 
+    for (i = 0; i < n; i++) {
+      if (mask1[index1][i] && mask2[index2][i]) {
+	xx += weight[i] * data1[index1][i] * data1[index1][i] ;
+	yy += weight[i] * data2[index2][i] * data2[index2][i] ;
+	xdoty += weight[i] * data1[index1][i] * data2[index2][i];
+      }
+    }
+    ang = acos( (xdoty/(xx*yy)));
+  } else { /* not transposed */
+    printf("not implemented yet; may never be implemented\n");
+    ang = 0.0;
+  }
+  return ang;
+}
+
+
+/* *********************************************************************  */
+/*
+static double cosine(int n, double** data1, double** data2, int** mask1, int** mask2,
+		    const double weight[],int index1, int index2, int transpose){
+Purpose
+=======
+
+The cosine routine calculates the vector cosine between two
+rows or columns; aka cosine(x,y) = x . y /(|x| |y|) 
+
+Arguments (same as elsewhere)
+*/
+
+static double cosine(int n, double** data1, double** data2, int** mask1, int** mask2,
+		    const double weight[],int index1, int index2, int transpose){
+  double ang;
+  double xx = 0;
+  double yy = 0;
+  double xdoty = 0;
+  int i;
+  if (transpose==0)  { 
+    for (i = 0; i < n; i++) {
+      if (mask1[index1][i] && mask2[index2][i]) {
+	xx += weight[i] * data1[index1][i] * data1[index1][i] ;
+	yy += weight[i] * data2[index2][i] * data2[index2][i] ;
+	xdoty += weight[i] * data1[index1][i] * data2[index2][i];
+      }
+    }
+    ang =  xdoty / (xx*yy);
+  } else { /* not transposed */
+    printf("not implemented yet; may never be implemented\n");
+    ang = 0.0;
+  }
+  return ang;
+}
+
+
+/* *********************************************************************  */
+/*
+static double chebyshev(int n, double** data1, double** data2, int** mask1, 
+                                      int** mask2, const double weight[],int index1, 
+                                      int index2, int transpose)
+Purpose
+=======
+
+The chebyshev distance calculates the vector cosine between two
+rows or columns; aka cosine(x,y) = x . y /(|x| |y|) 
+
+Arguments (same as elsewhere)
+*/
+
+static double chebyshev(int n, double** data1, double** data2, int** mask1, 
+			int** mask2, const double weight[],int index1, int index2, 
+			int transpose){
+  double linf = 0;
+  int i;
+  if (transpose==0)  { 
+    for (i = 0; i < n; i++) {
+      if (mask1[index1][i] && mask2[index2][i]) {
+	linf = max(linf, abs( weight[i]*(data1[index1][i] - data2[index2][i])));
+      }
+    }
+  } else { /* not transposed */
+    printf("not implemented yet; may never be implemented\n");
+    linf = 0.0;
+  }
+  return linf;
+}
+
+
+
+
+
+/* *********************************************************************  */
 
 static double(*setmetric(char dist)) 
-  (int, double**, double**, int**, int**, const double[], int, int, int)
-{ switch(dist)
-  { case 'e': return &euclid;
-    case 'b': return &cityblock;
-    case 'c': return &correlation;
-    case 'a': return &acorrelation;
-    case 'u': return &ucorrelation;
-    case 'x': return &uacorrelation;
-    case 's': return &spearman;
-    case 'k': return &kendall;
-    default: return &euclid;
+  (int, double**, double**, int**, int**, const double[], int, int, int){ 
+  switch(dist)  { 
+  case 'e': return &euclid;
+  case 'b': return &cityblock;
+  case 'c': return &correlation;
+  case 'a': return &acorrelation;
+  case 'u': return &ucorrelation;
+  case 'x': return &uacorrelation;
+  case 's': return &spearman;
+  case 'k': return &kendall;
+  case 'o': return &angle; 
+  case 'n': return &cosine; 
+  case 'y': return &chebyshev;
+  default: return &euclid;
   }
   return NULL; /* Never get here */
 }
@@ -2903,9 +2857,11 @@ to 0. If kmedoids fails due to a memory allocation error, ifound is set to -1.
 
 /* ******************************************************************** */
 
+
+/*
 double** distancematrix (int nrows, int ncolumns, double** data,
   int** mask, double weights[], char dist, int transpose)
-/*
+
 Purpose
 =======
 
@@ -2966,7 +2922,9 @@ when microarrays are being clustered.
 
 ========================================================================
 */
-{ /* First determine the size of the distance matrix */
+double** distancematrix (int nrows, int ncolumns, double** data,
+			 int** mask, double weights[], char dist, int transpose){ 
+  /* First determine the size of the distance matrix */
   const int n = (transpose==0) ? nrows : ncolumns;
   const int ndata = (transpose==0) ? ncolumns : nrows;
   int i,j;
@@ -2992,27 +2950,23 @@ when microarrays are being clustered.
     for (i = 1; i < j; i++) free(matrix[i]);
     return NULL;
   }
-  /* Calculate the distances and save them in the ragged array */
-  /* for (i = 1; i < n; i++) { */
-  /*   for (j = 0; j < i; j++) { */
-  /*     matrix[i][j]=metric(ndata,data,data,mask,mask,weights,i,j,transpose); /\* this is a problem *\/ */
-  /*   } */
-  /* } */
 
-   for (i = 1; i < n; i++)
-     for (j = 0; j < i; j++)
+  for (i = 1; i < n; i++) {
+    for (j = 0; j < i; j++) {
        matrix[i][j]=metric(ndata,data,data,mask,mask,weights,i,j,transpose);
-
+    }
+  }
   return matrix;
 }
 
 
 /* ******************************************************************** */
 
+
+/*
 double* calculate_weights(int nrows, int ncolumns, double** data, int** mask,
   double weights[], int transpose, char dist, double cutoff, double exponent)
 
-/*
 Purpose
 =======
 
@@ -3079,7 +3033,10 @@ weights array, the function returns NULL.
 
 ========================================================================
 */
-{ int i,j;
+double* calculate_weights(int nrows, int ncolumns, double** data, int** mask,
+			  double weights[], double result[], int transpose, char dist, 
+			  double cutoff,  double exponent){ 
+  int i,j;
   const int ndata = (transpose==0) ? ncolumns : nrows;
   const int nelements = (transpose==0) ? nrows : ncolumns;
 
@@ -3088,9 +3045,9 @@ weights array, the function returns NULL.
     (int, double**, double**, int**, int**, const double[], int, int, int) =
        setmetric(dist);
 
-  double* result = malloc(nelements*sizeof(double));
-  if (!result) return NULL;
-  memset(result, 0, nelements*sizeof(double));
+  /* double* result = malloc(nelements*sizeof(double)); */
+  /* if (!result) return NULL; */
+  /* memset(result, 0, nelements*sizeof(double)); */
 
   for (i = 0; i < nelements; i++)
   { result[i] += 1.0;
@@ -3111,9 +3068,10 @@ weights array, the function returns NULL.
 
 /* ******************************************************************** */
 
-void cuttree (int nelements, Node* tree, int nclusters, int clusterid[])  /* int clusterid[] */
 
 /*
+void cuttree (int nelements, Node* tree, int nclusters, int clusterid[])  
+
 Purpose
 =======
 
@@ -3143,7 +3101,8 @@ error occured, all elements in clusterid are set to -1.
 
 ========================================================================
 */
-{ int i, j, k;
+void cuttree (int nelements, Node* tree, int nclusters, int clusterid[])  { 
+  int i, j, k;
   int icluster = 0;
   const int n = nelements-nclusters; /* number of nodes to join */
   int* nodeid;
@@ -3178,19 +3137,16 @@ error occured, all elements in clusterid are set to -1.
     if (k<0) nodeid[-k-1] = j; else clusterid[k] = j;
   }
   free(nodeid);
-  for(i =0;i<nelements;i++) {
-    printf("%d ",clusterid[i]);
-  }
   return;
 }
 
 /* ******************************************************************** */
 
+
+/*
 static
 Node* pclcluster (int nrows, int ncolumns, double** data, int** mask,
   double weight[], double** distmatrix, char dist, int transpose)
-
-/*
 
 Purpose
 =======
@@ -3254,7 +3210,9 @@ structure.
 If a memory error occurs, pclcluster returns NULL.
 ========================================================================
 */
-{ int i, j;
+static Node* pclcluster (int nrows, int ncolumns, double** data, int** mask,
+			 double weight[], double** distmatrix, char dist, int transpose){ 
+  int i, j;
   const int nelements = (transpose==0) ? nrows : ncolumns;
   int inode;
   const int ndata = transpose ? nrows : ncolumns;
@@ -3362,11 +3320,11 @@ int nodecompare(const void* a, const void* b)
 
 /* ---------------------------------------------------------------------- */
 
+
+/*
 static
 Node* pslcluster (int nrows, int ncolumns, double** data, int** mask,
   double weight[], double** distmatrix, char dist, int transpose)
-
-/*
 
 Purpose
 =======
@@ -3445,7 +3403,9 @@ If a memory error occurs, pslcluster returns NULL.
 
 ========================================================================
 */
-{ int i, j, k;
+static Node* pslcluster (int nrows, int ncolumns, double** data, int** mask,
+			 double weight[], double** distmatrix, char dist, int transpose) { 
+int i, j, k;
   const int nelements = transpose ? ncolumns : nrows;
   const int nnodes = nelements - 1;
   int* vector;
@@ -3540,8 +3500,9 @@ If a memory error occurs, pslcluster returns NULL.
 }
 /* ******************************************************************** */
 
-static Node* pmlcluster (int nelements, double** distmatrix)
+
 /*
+static Node* pmlcluster (int nelements, double** distmatrix)
 
 Purpose
 =======
@@ -3571,8 +3532,8 @@ structure.
 If a memory error occurs, pmlcluster returns NULL.
 ========================================================================
 */
-{ int j;
-  int n;
+static Node* pmlcluster (int nelements, double** distmatrix) { 
+  int j,n;
   int* clusterid;
   Node* result;
 
@@ -3616,8 +3577,10 @@ If a memory error occurs, pmlcluster returns NULL.
 
 /* ******************************************************************* */
 
-static Node* palcluster (int nelements, double** distmatrix)
+
 /*
+static Node* palcluster (int nelements, double** distmatrix)
+
 Purpose
 =======
 
@@ -3646,8 +3609,8 @@ structure.
 If a memory error occurs, palcluster returns NULL.
 ========================================================================
 */
-{ int j;
-  int n;
+static Node* palcluster (int nelements, double** distmatrix){ 
+  int j,n;
   int* clusterid;
   int* number;
   Node* result;
@@ -3655,13 +3618,13 @@ If a memory error occurs, palcluster returns NULL.
   clusterid = malloc(nelements*sizeof(int));
   if(!clusterid) return NULL;
   number = malloc(nelements*sizeof(int));
-  if(!number)
-  { free(clusterid);
+  if(!number)  { 
+    free(clusterid);
     return NULL;
   }
   result = malloc((nelements-1)*sizeof(Node));
-  if (!result)
-  { free(clusterid);
+  if (!result)  { 
+    free(clusterid);
     free(number);
     return NULL;
   }
@@ -3669,13 +3632,13 @@ If a memory error occurs, palcluster returns NULL.
   /* Setup a list specifying to which cluster a gene belongs, and keep track
    * of the number of elements in each cluster (needed to calculate the
    * average). */
-  for (j = 0; j < nelements; j++)
-  { number[j] = 1;
+  for (j = 0; j < nelements; j++) {
+    number[j] = 1;
     clusterid[j] = j;
   }
 
-  for (n = nelements; n > 1; n--)
-  { int sum;
+  for (n = nelements; n > 1; n--) {
+    int sum;
     int is = 1;
     int js = 0;
     result[nelements-n].distance = find_closest_pair(n, distmatrix, &is, &js);
@@ -3686,18 +3649,18 @@ If a memory error occurs, palcluster returns NULL.
 
     /* Fix the distances */
     sum = number[is] + number[js];
-    for (j = 0; j < js; j++)
-    { distmatrix[js][j] = distmatrix[is][j]*number[is]
-                        + distmatrix[js][j]*number[js];
+    for (j = 0; j < js; j++) {
+      distmatrix[js][j] = distmatrix[is][j]*number[is]
+	+ distmatrix[js][j]*number[js];
       distmatrix[js][j] /= sum;
     }
-    for (j = js+1; j < is; j++)
-    { distmatrix[j][js] = distmatrix[is][j]*number[is]
+    for (j = js+1; j < is; j++) {
+      distmatrix[j][js] = distmatrix[is][j]*number[is]
                         + distmatrix[j][js]*number[js];
       distmatrix[j][js] /= sum;
     }
-    for (j = is+1; j < n; j++)
-    { distmatrix[j][js] = distmatrix[j][is]*number[is]
+    for (j = is+1; j < n; j++) {
+      distmatrix[j][js] = distmatrix[j][is]*number[is]
                         + distmatrix[j][js]*number[js];
       distmatrix[j][js] /= sum;
     }
@@ -3721,9 +3684,13 @@ If a memory error occurs, palcluster returns NULL.
 
 /* ******************************************************************* */
 
+
+/* 
 Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
-		   double weight[], int transpose, char dist, char method, double** distmatrix) 
-/*
+		   double weight[], int transpose, char dist, char method, 
+		   double** distmatrix) 
+
+
 Purpose
 =======
 
@@ -3801,8 +3768,9 @@ If a memory error occurs, treecluster returns NULL.
 
 ========================================================================
 */
-{ 
-  /*  double** distmatrix=NULL; */
+Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
+		   double weight[], int transpose, char dist, char method, 
+		   double** distmatrix) { 
   Node* result = NULL;
   const int nelements = (transpose==0) ? nrows : ncolumns;
   const int ldistmatrix = (distmatrix==NULL && method!='s') ? 1 : 0;
@@ -3816,54 +3784,25 @@ If a memory error occurs, treecluster returns NULL.
   }
 
 
-
-  /* int i,j; /\* erase these later *\/ */
-  /* for(i=0; i<nrows; i++)  { */
-  /*   printf("Data %2d:",i); */
-  /*   for(j=0; j<ncolumns; j++) printf("val=%5.2f  ",i,j,data[i][j]); */
-  /*   printf("\n"); */
-  /* } */
-
-  int i,j; /* erase these later */
-  for(i=0; i<nrows; i++)  {
-    printf("Data %2d:",i);
-    for(j=0; j<ncolumns; j++) printf("val=%d  ",mask[i][j]);
-    printf("\n");
+  switch(method) {
+  case 's':
+    result = pslcluster(nrows, ncolumns, data, mask, weight, distmatrix,
+			dist, transpose);
+    break;
+  case 'm':
+    result = pmlcluster(nelements, distmatrix);
+    break;
+  case 'a':
+    result = palcluster(nelements, distmatrix);
+    break;
+  case 'c':
+    result = pclcluster(nrows, ncolumns, data, mask, weight, distmatrix,
+			dist, transpose);
+    break;
   }
 
-
-  switch(method)
-  { case 's':
-      result = pslcluster(nrows, ncolumns, data, mask, weight, distmatrix,
-                          dist, transpose);
-      break;
-    case 'm':
-      result = pmlcluster(nelements, distmatrix);
-      break;
-    case 'a':
-      result = palcluster(nelements, distmatrix);
-      break;
-    case 'c':
-      result = pclcluster(nrows, ncolumns, data, mask, weight, distmatrix,
-                          dist, transpose);
-      break;
-  }
-  /* Deallocate space for distance matrix, if it was allocated by treecluster */
-
-  /* int i,j; */
-  /* printf("   Gene:"); */
-  /* for(i=0; i<nrows-1; i++) printf("%6d", i); */
-  /* printf("\n"); */
-  /* for(i=0; i<nrows; i++) */
-  /*   { printf("Gene %2d:",i); */
-  /*   for(j=0; j<i; j++) printf(" %5.2f",distmatrix[i][j]); */
-  /*   printf("\n"); */
-  /* } */
-
-  if(ldistmatrix)
-  { int i;
-    for (i = 1; i < nelements; i++) free(distmatrix[i]);
-    free (distmatrix);
+  if(ldistmatrix) { 
+    freedistmx(nelements,distmatrix);
   }
   return result;
 }

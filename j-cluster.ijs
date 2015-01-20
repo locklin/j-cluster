@@ -1,3 +1,45 @@
+coclass 'jcluster'
+
+create=: 3 : 0
+ 'dist meth data'=: y
+ distmx=: dist distancematrix data
+ wt =: ({: $ y) $ 2.7 - 1.7
+ mask =.  masker data
+ 'nr nc' =: $ data
+ cmd=. LIBCLUST,' treecluster * x x *x *x *d x c c x'
+ HC=: 0 pick cmd cd nr;nc;(unDoub data); (unInt mask) ;wt;0;dist;meth;distmx
+ 1
+)
+
+destroy=: 3 : 0
+ nr freedistmx distmx
+ freenodes HC
+ codestroy ''
+)
+
+NB. gives clusters
+cutree=: 3 : 0
+ clustid =. nr $ 0
+ cmd=. LIBCLUST,' cuttree n x x x *i'
+ 4 pick cmd cd nr;HC;y;clustid
+)
+
+NB. dumps the tree and splits
+dumptree=: 3 : 0
+ cmd=. LIBCLUST,' dumpTree i i x *i *i *d'
+ dst =.  nr $ 1.7 - 1.7
+ wx =. nr $ 1-1
+ wy =. nr $ 1-1
+ cmd cd nr;HC;wx;wy;dst
+ wx;wy;dst
+)
+
+clustdist=: 3 : 0
+cmd=. LIBCLUST,' clusterdistance d x x x x *d i i *i *i c c x'
+)
+
+
+
 3 : 0''
 if. UNAME-:'Linux' do.
   LIBCLUST=:  '/home/scott/src/j-cluster/libhcluster.so'
@@ -40,7 +82,7 @@ treetst =: 3 : 0
  ('e';'s') treetst y
 :
  'dist meth' =. x
- wt =. ({: $ y) $ 2.7 - 1.7
+  wt =. ({: $ y) $ 2.7 - 1.7
  mask =.  masker y
  'nr nc' =. $ y
  cmd=. LIBCLUST,' treecluster * x x *x *x *d x c c *x'
@@ -48,34 +90,58 @@ treetst =: 3 : 0
 )
 
 
-cutree =: 3 : 0
+treetst2 =: 3 : 0
+ ('e';'s') treetst y
+:
+ 'dist meth' =. x
+ wt =. ({: $ y) $ 2.7 - 1.7
+ mask =.  masker y
+ 'nr nc' =. $ y
+ mydist =. distancematrix y
+ cmd=. LIBCLUST,' treecluster * x x *x *x *d x c c x'
+ out=. 0 pick cmd cd nr;nc;(unDoub y); (unInt mask) ;wt;0;dist;meth;mydist
+ nr freedistmx mydist
+ out
+)
+
+
+cutreeIn =: 3 : 0
  'nelements tree nclust'=.y
  clustid =. nelements $ 0
  cmd=. LIBCLUST,' cuttree n x x x *i'
  4 pick cmd cd nelements;tree;nclust;clustid
 )
 
-median=: 3 : 0
-n=.#y
-cmd=. LIBCLUST,' median d x *d'
-0 pick cmd cd n;y
+NB. frees the malloc in the hclust piece
+freenodes=: 3 : 0
+ cmd=. LIBCLUST,' freeNodes i x'
+ 0 pick cmd cd y
 )
 
-
-NB. this should probably never be used.
+NB. initializes distance matrix
 distancematrix=: 3 : 0
  'e' distancematrix y
 :
  wts =. ({: $ y) $ 2.7 - 1.7
- mask=. masker y
  'nr nc' =. $ y
  mask =. masker y
  cmd=. LIBCLUST,' distancematrix * x x *x *x *d c x'
  0 pick cmd cd nr;nc;(unDoub y);(unInt mask);wts;x;0
 )
 
+NB. this frees the allocated distance matrix
+freedistmx =: 4 : 0
+cmd=. LIBCLUST,' freedistmx i x x'
+0 pick cmd cd x;y
+)
 
-NB. probably not needed
+showdists=: 4 : 0
+'nr nc'=.x
+cmd =. LIBCLUST,' show_dists n i x'
+cmd cd nr; y
+)
+
+NB. probably also not needed
 clusterdistance =: 4 : 0
  'nr nc' =. $ y
  wts =. ({: $ y) $ 2.7 - 1.7

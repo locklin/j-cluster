@@ -17,7 +17,6 @@ dist:
 cluster.o: cluster.c
 	$(COMPILER) $(COPTS) cluster.o cluster.c  $(LIBS) $(CFLAGS)
 
-
 cluster: cluster.o 
 	$(COMPILER) -shared -Wstrict-prototypes -fno-strict-aliasing -Wl,-soname,libhcluster.so -o libhcluster.so \
 	cluster.o -lc -lm

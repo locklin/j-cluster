@@ -26,12 +26,6 @@
  * 
  */
 
-#include <time.h>
-#include <stdlib.h>
-#include <math.h>
-#include <float.h>
-#include <limits.h>
-#include <string.h>
 #include "cluster.h"
 #include <stdio.h> /* remove this SCL */
 #ifdef WINDOWS
@@ -268,7 +262,8 @@ static int makedatamask(int nrows, int ncols, double*** pdata, int*** pmask) {
 
 /* ---------------------------------------------------------------------- */
 
-static void freedatamask(int n, double** data, int** mask) {
+static void freedatamask(int n, double** data, int** mask) 
+{
   int i;
   for (i = 0; i < n; i++) {
     free(mask[i]);
@@ -279,13 +274,22 @@ static void freedatamask(int n, double** data, int** mask) {
 }
 
 /* ---------------------------------------------------------------------- */
-static int freedistmx(int n, double** dist)
+int freedistmx(int n, double** dist)
 {
   int i;
   for (i = 1; i < n; i++) {
     free(dist[i]);
   }
   free (dist);
+  return 1;
+}
+/* ---------------------------------------------------------------------- */
+
+
+/* ---------------------------------------------------------------------- */
+int freeNodes(Node* mynodes)
+{
+  free(mynodes);
   return 1;
 }
 /* ---------------------------------------------------------------------- */
@@ -330,6 +334,43 @@ static double find_closest_pair(int n, double** distmatrix, int* ip, int* jp) {
     }
   }
   return distance;
+}
+
+
+
+/* static double row_wise_farthest_dist(int n, double** distmatrix, int* ip, int* jp) {  */
+/*   int i, j; */
+/*   double temp; */
+/*   double distance = distmatrix[1][0]; */
+/*   *ip = 1; */
+/*   *jp = 0; */
+/*   for (i = 1; i < n; i++)  {  */
+/*     for (j = 0; j < i; j++)  {  */
+/*       temp = distmatrix[i][j]; */
+/*       if (temp<distance) {  */
+/* 	distance = temp; */
+/*         *ip = i; */
+/*         *jp = j; */
+/*       } */
+/*     } */
+/*   } */
+/*   return distance; */
+/* } */
+
+
+/* Print the data matrix */
+void show_dists(int nrows, double** distMx){
+  int i, j;
+  printf("   Row: ");
+  for(i=0; i<nrows-1; i++) printf("%9d", i);
+  printf("\n");
+  for(i=0; i<nrows; i++) {
+    printf("Row %2d: ",i);
+    for(j=0; j<i; j++) printf(" %f",distMx[i][j]);
+    printf("\n");
+  }
+  printf("\n");
+  return;
 }
 
 /* ********************************************************************* */
@@ -944,6 +985,10 @@ int pca(int nrows, int ncolumns, double** u, double** v, double* w){
 
 /* ********************************************************************* */
 
+
+
+
+
  
 /*
 static double euclid (int n, double** data1, double** data2, int** mask1, int** mask2,
@@ -954,6 +999,10 @@ Purpose
 
 The euclid routine calculates the weighted Euclidean distance between two
 rows or columns in a matrix.
+
+Note that it is technically broken, since the weighting scheme adds the weights
+in a funny way that makes the distance dthis = d * ncol; should be fine for 
+clustering since it's just a multiplication
 
 Arguments
 =========
@@ -1678,6 +1727,7 @@ static double(*setmetric(char dist))
   }
   return NULL; /* Never get here */
 }
+
 
 /* *********************************************************************  */
 
@@ -3142,6 +3192,17 @@ void cuttree (int nelements, Node* tree, int nclusters, int clusterid[])  {
 
 /* ******************************************************************** */
 
+int dumpTree(int nc,Node* tree,int lt[], int rt[], double dist[]) {
+  int i;
+  for (i = 0; i < nc; i++) {
+    lt[i] = tree[i].left;
+    rt[i] = tree[i].right;
+    dist[i] = tree[i].distance;
+  }
+  return 1;
+} 
+
+/* ******************************************************************** */
 
 /*
 static
@@ -3783,7 +3844,6 @@ Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
     if (!distmatrix) return NULL; /* Insufficient memory */
   }
 
-
   switch(method) {
   case 's':
     result = pslcluster(nrows, ncolumns, data, mask, weight, distmatrix,
@@ -3800,6 +3860,18 @@ Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
 			dist, transpose);
     break;
   }
+  
+
+  /* for(i=0; i<nrows; i++) { */
+  /*   printf("Row %2d: ",i); */
+  /*   printf("w= %f ", weight[i]); */
+  /*     for(j=0; j<ncolumns; j++) { */
+  /* 	printf("d= %f ",data[i][j]); */
+  /* 	printf("m= %d ",mask[i][j]); */
+  /*     } */
+  /*     printf("\n"); */
+  /* } */
+
 
   if(ldistmatrix) { 
     freedistmx(nelements,distmatrix);

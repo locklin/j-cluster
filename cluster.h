@@ -26,6 +26,12 @@
  * OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
+#include <time.h>
+#include <stdlib.h>
+#include <math.h>
+#include <float.h>
+#include <limits.h>
+#include <string.h>
 
 #ifndef min
 #define min(x, y)	((x) < (y) ? (x) : (y))
@@ -38,7 +44,7 @@
 #  include <windows.h>
 #endif
 
-#define CLUSTERVERSION "1.52a"
+#define CLUSTERVERSION "1.55"
 
 /* Chapter 2 */
 double clusterdistance (int nrows, int ncolumns, double** data, int** mask,
@@ -46,6 +52,10 @@ double clusterdistance (int nrows, int ncolumns, double** data, int** mask,
   char method, int transpose);
 double** distancematrix (int ngenes, int ndata, double** data,
   int** mask, double* weight, char dist, int transpose);
+
+int freedistmx(int nrow, double** distance);
+
+void show_dists(int nrow,  double** distmx);
 
 /* Chapter 3 */
 int getclustercentroids(int nclusters, int nrows, int ncolumns,
@@ -70,11 +80,15 @@ typedef struct {int left; int right; double distance;} Node;
  * nodes -1..-(nelements-1). For each node, distance contains the distance
  * between the two subnodes that were joined.
  */
+int freeNodes(Node* mynode);
+
 
 Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
   double weight[], int transpose, char dist, char method, double** distmatrix);
 
 void cuttree (int nelements, Node* tree, int nclusters, int clusterid[]);
+
+int dumpTree(int nc,Node* tree,int lt[], int rt[], double dist[]);
 
 /* Chapter 5 */
 void somcluster (int nrows, int ncolumns, double** data, int** mask,
@@ -94,6 +108,7 @@ double* calculate_weights(int nrows, int ncolumns, double** data, int** mask,
 			  double weights[], double res[], int transpose, char dist, 
 			  double cutoff, double exponent);
 
-double mymetric(char dist,int nc, double** data, int** mask,  double* weights, int i, int j);
 
-double euclid2(double** data, int nc, int i, int j);
+
+
+

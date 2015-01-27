@@ -50,8 +50,12 @@
 double clusterdistance (int nrows, int ncolumns, double** data, int** mask,
   double weight[], int n1, int n2, int index1[], int index2[], char dist,
   char method, int transpose);
+
 double** distancematrix (int ngenes, int ndata, double** data,
   int** mask, double* weight, char dist, int transpose);
+
+double farthest_distance(int n, double** dist);
+double summed_distances(int n, double** dist);
 
 int freedistmx(int nrow, double** distance);
 

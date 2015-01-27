@@ -1,8 +1,31 @@
 coclass 'jcluster'
 
+NB. 'metric;clustmeth;normalize;data'
+NB. available distance metrics:
+NB. case 'e': euclid;
+NB. case 'b': cityblock;
+NB. case 'c': correlation;
+NB. case 'a': acorrelation;
+NB. case 'u': ucorrelation;
+NB. case 'x': uacorrelation;
+NB. case 's': spearman;
+NB. case 'k': kendall;
+NB. case 'o': angle; 
+NB. case 'n': cosine; 
+NB. case 'y': chebyshev;
+NB.
+NB. available cluster methods:
+NB. 's': pairwise single-linkage clustering
+NB. 'm': pairwise maximum- (or complete-) linkage clustering
+NB. 'a': pairwise average-linkage clustering
+NB. 'c': pairwise centroid-linkage clustering
+NB. 
+NB. normalize; 0 for none, 1 for variance normalized
+NB. 
+NB. data; a rank 2 array of doubles
 create=: 3 : 0
- 'dist meth data'=: y
- distmx=: dist distancematrix data
+ 'dist meth norm data'=: y
+ distmx=: dist distancematrix ". norm {:: 'data';'zscoreData data'
  wt =: ({: $ y) $ 2.7 - 1.7
  mask =.  masker data
  'nr nc' =: $ data
@@ -24,21 +47,42 @@ cutree=: 3 : 0
  4 pick cmd cd nr;HC;y;clustid
 )
 
+uncentral=: 3 : 0
+ distmx&uncent"0 i.nr
+)
+
+central=: 3 : 0
+ distmx&cent"0 i.nr
+)
+
+uncent=: 4 : 0
+ cmd =. LIBCLUST,' farthest_distance d i x'
+ 0 pick cmd cd y;x
+)
+
+cent=: 3 : 0
+ cmd =. LIBCLUST,' summed_distance d i x' 
+ 0 pick cmd cd y;x
+)
+
 NB. dumps the tree and splits
 dumptree=: 3 : 0
  cmd=. LIBCLUST,' dumpTree i i x *i *i *d'
- dst =.  nr $ 1.7 - 1.7
- wx =. nr $ 1-1
- wy =. nr $ 1-1
+ dst =.  (nr-1) $ 1.7 - 1.7
+ wx =. (nr-1) $ 1-1
+ wy =. (nr-1) $ 1-1
  cmd cd nr;HC;wx;wy;dst
- wx;wy;dst
+ dst;wx,.wy
 )
+
 
 clustdist=: 3 : 0
-cmd=. LIBCLUST,' clusterdistance d x x x x *d i i *i *i c c x'
+ cmd=. LIBCLUST,' clusterdistance d x x x x *d i i *i *i c c x'
 )
 
-
+mean=: +/%#
+variance=: mean@:*: - *:@mean
+zscoreData=:  (-"_1 _ mean) %"_1 _ %:@:variance 
 
 3 : 0''
 if. UNAME-:'Linux' do.
@@ -52,18 +96,6 @@ elseif. do.
 end.
 )
 
-NB. available distance metrics
-NB. case 'e': return &euclid;
-NB. case 'b': return &cityblock;
-NB. case 'c': return &correlation;
-NB. case 'a': return &acorrelation;
-NB. case 'u': return &ucorrelation;
-NB. case 'x': return &uacorrelation;
-NB. case 's': return &spearman;
-NB. case 'k': return &kendall;
-NB. case 'o': return &angle; 
-NB. case 'n': return &cosine; 
-NB. case 'y': return &chebyshev;
 
 NB. creates mask
 masker =: 0+ [: -. 128!:5 +. _ = ]
@@ -103,6 +135,7 @@ treetst2 =: 3 : 0
  nr freedistmx mydist
  out
 )
+
 
 
 cutreeIn =: 3 : 0

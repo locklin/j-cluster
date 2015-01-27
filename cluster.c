@@ -323,11 +323,11 @@ static double find_closest_pair(int n, double** distmatrix, int* ip, int* jp) {
   double distance = distmatrix[1][0];
   *ip = 1;
   *jp = 0;
-  for (i = 1; i < n; i++)
-  { for (j = 0; j < i; j++)
-    { temp = distmatrix[i][j];
-      if (temp<distance)
-      { distance = temp;
+  for (i = 1; i < n; i++){ 
+    for (j = 0; j < i; j++){ 
+      temp = distmatrix[i][j];
+      if (temp<distance) { 
+	distance = temp;
         *ip = i;
         *jp = j;
       }
@@ -336,7 +336,33 @@ static double find_closest_pair(int n, double** distmatrix, int* ip, int* jp) {
   return distance;
 }
 
+/* these two functions are useful for geometers and topologists */
+double farthest_distance(int n, double** distmatrix) {
+  int i, j;
+  double temp;
+  double distance = distmatrix[1][0];
+  for (i = 1; i < n; i++){ 
+    for (j = 0; j < i; j++){ 
+      temp = distmatrix[i][j];
+      if (temp>distance) { 
+	distance = temp;
+      }
+    }
+  }
+  return distance;
+}
 
+
+ double summed_distances(int n, double** distmatrix) {
+  int i, j;
+  double distance = distmatrix[1][0];
+  for (i = 1; i < n; i++){ 
+    for (j = 0; j < i; j++){ 
+      distance = distance + distmatrix[i][j];
+    }
+  }
+  return distance;
+}
 
 /* static double row_wise_farthest_dist(int n, double** distmatrix, int* ip, int* jp) {  */
 /*   int i, j; */

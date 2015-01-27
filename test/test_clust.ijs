@@ -8,6 +8,7 @@ rownames =. >0{"1 }.raw
 hc=: conew 'jcluster'
 create__hc 'e';'s';data
 cutree__hc 20
+'dst cmx'=. dumptree__hc ''
 destroy__hc ''
 
 

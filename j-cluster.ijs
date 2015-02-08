@@ -75,6 +75,11 @@ dumptree=: 3 : 0
  dst;wx,.wy
 )
 
+NB. feed this the tree distances from dumptree
+nclustLogMax=: # - [: maxdx [: diff ^.
+nclustLogMax_z_ =: nclustLogMax_jcluster_
+
+
 
 clustdist=: 3 : 0
  cmd=. LIBCLUST,' clusterdistance d x x x x *d i i *i *i c c x'
@@ -83,6 +88,8 @@ clustdist=: 3 : 0
 mean=: +/%#
 variance=: mean@:*: - *:@mean
 zscoreData=:  (-"_1 _ mean) %"_1 _ %:@:variance 
+diff=: (] , {:) - {. , ]
+maxdx=: [: I. >./ = ]
 
 3 : 0''
 if. UNAME-:'Linux' do.
@@ -99,6 +106,7 @@ end.
 
 NB. creates mask
 masker =: 0+ [: -. 128!:5 +. _ = ]
+
 
 unDoub =: 3 : 0
  (15!:14 <'y') +(8*{:$y)*i.{.$y
@@ -164,8 +172,8 @@ distancematrix=: 3 : 0
 
 NB. this frees the allocated distance matrix
 freedistmx =: 4 : 0
-cmd=. LIBCLUST,' freedistmx i x x'
-0 pick cmd cd x;y
+ cmd=. LIBCLUST,' freedistmx i x x'
+ 0 pick cmd cd x;y
 )
 
 showdists=: 4 : 0

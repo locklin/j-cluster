@@ -17,3 +17,8 @@ I added 3 so far; Chebyshev, Cosine and Angle.
 I guess having the flexibility to generate distance metrics from J might
 be helpful at some point, so I'll leave the logic for that for now.
 
+One thing which should be noted: the actual distance calculations in the original
+library are wrong. Euclidean is anyway. However, it is mathematically self
+consistent, so as long as you're not using the absolute distances for something
+it should work just fine for clustering.
+

@@ -260,6 +260,8 @@ static int makedatamask(int nrows, int ncols, double*** pdata, int*** pmask) {
   return 0;
 }
 
+
+
 /* ---------------------------------------------------------------------- */
 
 static void freedatamask(int n, double** data, int** mask) 
@@ -1411,6 +1413,45 @@ static double uacorrelation (int n, double** data1, double** data2, int** mask1,
   result = 1. - result;
   return result;
 }
+
+static double* getrank (int n, double data[])
+/* Calculates the ranks of the elements in the array data. Two elements with
+ * the same value get the same rank, equal to the average of the ranks had the
+ * elements different values. The ranks are returned as a newly allocated
+ * array that should be freed by the calling routine. If getrank fails due to
+ * a memory allocation error, it returns NULL.
+ */
+{ int i;
+  double* rank;
+  int* index;
+  rank = malloc(n*sizeof(double));
+  if (!rank) return NULL;
+  index = malloc(n*sizeof(int));
+  if (!index)
+  { free(rank);
+    return NULL;
+  }
+  /* Call sort to get an index table */
+  sort (n, data, index);
+  /* Build a rank table */
+  for (i = 0; i < n; i++) rank[index[i]] = i;
+  /* Fix for equal ranks */
+  i = 0;
+  while (i < n)
+  { int m;
+    double value = data[index[i]];
+    int j = i + 1;
+    while (j < n && data[index[j]] == value) j++;
+    m = j - i; /* number of equal ranks found */
+    value = rank[index[i]] + (m-1)/2.;
+    for (j = i; j < i + m; j++) rank[index[j]] = value;
+    i += m;
+  }
+  free (index);
+  return rank;
+}
+
+
 
 /* *********************************************************************  */
 
@@ -3218,12 +3259,13 @@ void cuttree (int nelements, Node* tree, int nclusters, int clusterid[])  {
 
 /* ******************************************************************** */
 
-int dumpTree(int nc,Node* tree,int lt[], int rt[], double dist[]) {
+int dumpTree(int nr, Node* tree,int lt[], int rt[], double dist[]) {
   int i;
-  for (i = 0; i < nc; i++) {
+  for (i = 0; i < nr; i++) {
     lt[i] = tree[i].left;
     rt[i] = tree[i].right;
     dist[i] = tree[i].distance;
+    /*    printf("dst= %f\n",dist[i]); */
   }
   return 1;
 } 
@@ -3861,6 +3903,7 @@ Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
   Node* result = NULL;
   const int nelements = (transpose==0) ? nrows : ncolumns;
   const int ldistmatrix = (distmatrix==NULL && method!='s') ? 1 : 0;
+  int i,j;
 
   if (nelements < 2) return NULL;
   /* Calculate the distance matrix if the user didn't give it */
@@ -3887,17 +3930,14 @@ Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
     break;
   }
   
-
-  /* for(i=0; i<nrows; i++) { */
-  /*   printf("Row %2d: ",i); */
-  /*   printf("w= %f ", weight[i]); */
-  /*     for(j=0; j<ncolumns; j++) { */
-  /* 	printf("d= %f ",data[i][j]); */
-  /* 	printf("m= %d ",mask[i][j]); */
-  /*     } */
-  /*     printf("\n"); */
-  /* } */
-
+  for(i=0; i<nrows; i++) {
+    printf("Row %2d: ",i);
+      for(j=0; j<ncolumns; j++) {
+	/*  	printf("d= %f ",data[i][j]); */
+  	printf("m= %d ",mask[i][j]);
+      }
+      printf("\n");
+  }
 
   if(ldistmatrix) { 
     freedistmx(nelements,distmatrix);
@@ -3905,6 +3945,77 @@ Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
   return result;
 }
 
+
+int** makemask(int nrows,int ncols) {
+  int** mask = malloc(nrows*sizeof(int*));
+  int i,j;
+  for (i = 0; i < nrows; i++) { 
+    mask[i] = malloc(ncols*sizeof(int));
+  }
+  for(i = 0; i< nrows; i++){
+    for(j = 0; j< nrows; j++){
+      mask[i][j] =1;
+    }
+  }
+  return mask;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void intDumper(int nrow, int ncol, int** mask){
+  int i,j;
+  for(i=0; i<nrow; i++) {
+    printf("Row %2d: ",i);
+      for(j=0; j<ncol; j++) {
+	/*  	printf("d= %f ",data[i][j]); */
+  	printf("m= %d ",mask[i][j]);
+      }
+      printf("\n");
+  }
+}
+
+
+void intDumper2(int nrow, int ncol, double** data, int** mask){
+  int i,j;
+  for(i=0; i<nrow; i++) {
+    printf("Row %2d: ",i);
+      for(j=0; j<ncol; j++) {
+	/*  	printf("d= %f ",data[i][j]); */
+  	printf("m= %d ",mask[i][j]);
+      }
+      printf("\n");
+  }
+}
+
+
+void intDumper3(int nrow, int ncol, int** mask, double** data){
+  int i,j;
+  for(i=0; i<nrow; i++) {
+    printf("Row %2d: ",i);
+      for(j=0; j<ncol; j++) {
+	/*  	printf("d= %f ",data[i][j]); */
+  	printf("m= %d ",mask[i][j]);
+      }
+      printf("\n");
+  }
+}
 
 
 /* ******************************************************************* */

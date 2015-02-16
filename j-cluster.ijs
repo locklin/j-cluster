@@ -25,12 +25,11 @@ NB.
 NB. data; a rank 2 array of doubles
 create=: 3 : 0
  'dist meth norm data'=: y
- distmx=: dist distancematrix ". norm {:: 'data';'zscoreData data'
- wt =: ({: $ y) $ 2.7 - 1.7
- mask =.  masker data
+ NB. distmx=: dist distancematrix ". norm {:: 'data';'zscoreData data'
+ distmx=: dist distancematrix data
  'nr nc' =: $ data
- cmd=. LIBCLUST,' treecluster * x x *x *x *d x c c x'
- HC=: 0 pick cmd cd nr;nc;(unDoub data); (unInt mask) ;wt;0;dist;meth;distmx
+ cmd=. LIBCLUST,' treecluster * c c i i x *x'
+ HC=: 0 pick cmd cd dist;meth;nr;nc;distmx;(unDoub data)
  1
 )
 
@@ -40,10 +39,10 @@ destroy=: 3 : 0
  codestroy ''
 )
 
-NB. gives clusters
+NB. gives cluster labels
 cutree=: 3 : 0
  clustid =. nr $ 0
- cmd=. LIBCLUST,' cuttree n x x x *i'
+ cmd=. LIBCLUST,' cuttree n i x i *i'
  4 pick cmd cd nr;HC;y;clustid
 )
 
@@ -68,22 +67,17 @@ cent=: 3 : 0
 NB. dumps the tree and splits
 dumptree=: 3 : 0
  cmd=. LIBCLUST,' dumpTree i i x *i *i *d'
- dst =.  (nr-1) $ 1.7 - 1.7
- wx =. (nr-1) $ 1-1
- wy =. (nr-1) $ 1-1
- cmd cd nr;HC;wx;wy;dst
+ nnr =. nr  - 1
+ dst =.  nnr $ 1.7 - 1.7
+ wx =. nnr $ 1-1
+ wy =. nnr $ 1-1
+ cmd cd nnr;HC;wx;wy;dst
  dst;wx,.wy
 )
 
 NB. feed this the tree distances from dumptree
-nclustLogMax=: # - [: maxdx [: diff ^.
+nclustLogMax=: 1+ # - [: maxdx [: diff ^.
 nclustLogMax_z_ =: nclustLogMax_jcluster_
-
-
-
-clustdist=: 3 : 0
- cmd=. LIBCLUST,' clusterdistance d x x x x *d i i *i *i c c x'
-)
 
 mean=: +/%#
 variance=: mean@:*: - *:@mean
@@ -104,52 +98,51 @@ end.
 )
 
 
-NB. creates mask
+NB. masker; may be useful later
 masker =: 0+ [: -. 128!:5 +. _ = ]
-
 
 unDoub =: 3 : 0
  (15!:14 <'y') +(8*{:$y)*i.{.$y
 )
 
-unInt =: 3 : 0
- yy =. 2 ic ,y
- (15!:14 <'yy') +(4*{:$y)*i.{.$y
-)
-
-
+NB. two examples of how to use the dll
 treetst =: 3 : 0
  ('e';'s') treetst y
 :
  'dist meth' =. x
-  wt =. ({: $ y) $ 2.7 - 1.7
- mask =.  masker y
  'nr nc' =. $ y
- cmd=. LIBCLUST,' treecluster * x x *x *x *d x c c *x'
- 0 pick cmd cd nr;nc;(unDoub y); (unInt mask) ;wt;0;dist;meth;(<<0)
+ cmd=. LIBCLUST,' treecluster * c c i i *x *x'
+ 0 pick cmd cd dist;meth;nr;nc;(<0);(unDoub y)
 )
 
-
 treetst2 =: 3 : 0
- ('e';'s') treetst y
+ ('e';'s') treetst2 y
 :
  'dist meth' =. x
- wt =. ({: $ y) $ 2.7 - 1.7
- mask =.  masker y
  'nr nc' =. $ y
- mydist =. distancematrix y
- cmd=. LIBCLUST,' treecluster * x x *x *x *d x c c x'
- out=. 0 pick cmd cd nr;nc;(unDoub y); (unInt mask) ;wt;0;dist;meth;mydist
+ mydist =. dist distancematrix y
+ cmd=. LIBCLUST,' treecluster * c c i i x *x'
+ out=. 0 pick cmd cd dist;meth;nr;nc;mydist;(unDoub y)
  nr freedistmx mydist
  out
 )
 
+NB. dumps the splits and distances for  use with treetst
+dumptreeIn=: 4 : 0
+ cmd=. LIBCLUST,' dumpTree i i x *i *i *d'
+ xx =. x - 1 
+ dst =.  xx $ 1.7 - 1.7
+ wx =. xx $ 1-1
+ wy =. xx $ 1-1
+ cmd cd xx;y;wx;wy;dst
+ dst;wx,.wy
+)
 
-
+NB. for treetst
 cutreeIn =: 3 : 0
  'nelements tree nclust'=.y
  clustid =. nelements $ 0
- cmd=. LIBCLUST,' cuttree n x x x *i'
+ cmd=. LIBCLUST,' cuttree n i x i *i'
  4 pick cmd cd nelements;tree;nclust;clustid
 )
 
@@ -163,11 +156,9 @@ NB. initializes distance matrix
 distancematrix=: 3 : 0
  'e' distancematrix y
 :
- wts =. ({: $ y) $ 2.7 - 1.7
  'nr nc' =. $ y
- mask =. masker y
- cmd=. LIBCLUST,' distancematrix * x x *x *x *d c x'
- 0 pick cmd cd nr;nc;(unDoub y);(unInt mask);wts;x;0
+ cmd=. LIBCLUST,' distancematrix * i i c *x'
+ 0 pick cmd cd nr;nc;x;(unDoub y)
 )
 
 NB. this frees the allocated distance matrix
@@ -176,70 +167,54 @@ freedistmx =: 4 : 0
  0 pick cmd cd x;y
 )
 
+NB. x should be nr
 showdists=: 4 : 0
-'nr nc'=.x
 cmd =. LIBCLUST,' show_dists n i x'
-cmd cd nr; y
+cmd cd x;y
 )
 
-NB. probably also not needed
-clusterdistance =: 4 : 0
- 'nr nc' =. $ y
- wts =. ({: $ y) $ 2.7 - 1.7
- mask=. masker y
- cmd =. LIBCLUST,' clusterdistance d i i *x *x *d i i *i *i c c i'
-)
-
-NB. probably also not needed
-somcluster =: 3 : 0
- cmd=. LIBCLUST,' somcluster n x x *d *x *d x x x d x c *d x'
-)
-
-
-NB. useful for comparison to lapack to see what your overhead is like
-pcaC =: 3 : 0
- 'nr nc' =. $ y
- nn =. (nr <. nc) 
- u =. y
- v =. (nn,nn) $ 1.1 - 1.1
- w =. (nn,nn) $ 1.1 - 1.1
- wts =. ({: $ y) $ 2.7 - 1.7
- cmd =. LIBCLUST,' pca i i i *x *x *x'
- cmd cd nr;nc;(unDoub u);(unDoub v);(unDoub w)
- u;v;w
-) 
+NB. clusterdistance =: 4 : 0
+NB.  'nr nc' =. $ y
+NB.  wts =. nc $ 2.7 - 1.7
+NB.  mask=. masker y
+NB.  cmd =. LIBCLUST,' clusterdistance d i i *x *x *d i i *i *i c c i'
+NB. )
+NB. NB. probably also not needed
+NB. somcluster =: 3 : 0
+NB.  cmd=. LIBCLUST,' somcluster n x x *d *x *d x x x d x c *d x'
+NB. )
+NB. NB. potentially useful for comparison to lapack to see what your overhead is like
+NB. pcaC =: 3 : 0
+NB.  'nr nc' =. $ y
+NB.  nn =. (nr <. nc) 
+NB.  u =. y
+NB.  v =. (nn,nn) $ 1.1 - 1.1
+NB.  w =. (nn,nn) $ 1.1 - 1.1
+NB.  wts =. ({: $ y) $ 2.7 - 1.7
+NB.  cmd =. LIBCLUST,' pca i i i *x *x *x'
+NB.  cmd cd nr;nc;(unDoub u);(unDoub v);(unDoub w)
+NB.  u;v;w
+NB. ) 
 
 
-calcweights=: 4 : 0
- 'kind cut exp' =. x
- 'nr nc' =. $ y
- wts =. ({: $ y) $ 2.7 - 1.7
- mask=. masker y
- res =. nr $ 2.2 - 2.2
- cmd =. LIBCLUST,' calculate_weights *d i i *x *x *d *d i c d d'
- 6 pick cmd cd nr;nc;(unDoub y);(unInt mask);wts;res;0;kind;cut;exp
-)
+NB. NB. henry rich's implementation of  Levenshtein  distance from j-list
+NB. levdist=: 4 : 0"1
+NB. 'a b'=. (/: #&>)x;y
+NB. z=. >: iz =. i.#b
+NB. for_j. a do.
+NB.    z=. <./\&.(-&iz) (>: <. (j ~: b) + |.!.j_index) z
+NB. end.
+NB. {:z
+NB. ) 
+NB. NB. Henry Rich does Jaccard
+NB. tanimoto =: (+&#   %/@:-   2 1&*@:(+/@:e.))&~."1 
+
+NB. NB. JP Jacobs
+NB. euclidean=: +/&:*:@(-"1)/ 
 
 
-NB. henry rich's implementation of  Levenshtein  distance from j-list
-levdist=: 4 : 0"1
-'a b'=. (/: #&>)x;y
-z=. >: iz =. i.#b
-for_j. a do.
-   z=. <./\&.(-&iz) (>: <. (j ~: b) + |.!.j_index) z
-end.
-{:z
-) 
-NB. Henry Rich does Jaccard
-tanimoto =: (+&#   %/@:-   2 1&*@:(+/@:e.))&~."1 
+NB. NB. Further reduction in execution time can be gotten by using integer arithmetic:
+NB. NB. d=: +/&:*:@(-"1)/&([: <. (2^20) * ]) 
 
-NB. JP Jacobs
-euclidean=: +/&:*:@(-"1)/ 
-
-
-
-NB. Further reduction in execution time can be gotten by using integer arithmetic:
-NB. d=: +/&:*:@(-"1)/&([: <. (2^20) * ]) 
-
-upTri=: , #~ [: , [: -.@>:/~@i. #
+NB. upTri=: , #~ [: , [: -.@>:/~@i. #
 

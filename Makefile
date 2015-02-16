@@ -14,11 +14,10 @@ clean:
 dist:
 	tar -cf ../cluster.tar *.c *.h Makefile README.md LICENSE 
 
-cluster.o: cluster.c
-	$(COMPILER) $(COPTS) cluster.o cluster.c  $(LIBS) $(CFLAGS)
+hclust.o: hclust.c
+	$(COMPILER) $(COPTS) hclust.o hclust.c  $(LIBS) $(CFLAGS)
 
-cluster: cluster.o 
+cluster: hclust.o
 	$(COMPILER) -shared -Wstrict-prototypes -fno-strict-aliasing -Wl,-soname,libhcluster.so -o libhcluster.so \
-	cluster.o -lc -lm
-
+	 hclust.o -lc -lm
 

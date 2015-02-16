@@ -46,34 +46,12 @@
 
 #define CLUSTERVERSION "1.55"
 
-/* Chapter 2 */
-double clusterdistance (int nrows, int ncolumns, double** data, int** mask,
-  double weight[], int n1, int n2, int index1[], int index2[], char dist,
-  char method, int transpose);
-
-double** distancematrix (int ngenes, int ndata, double** data,
-  int** mask, double* weight, char dist, int transpose);
-
+double** distancematrix (int ngenes, int ndata, char dist, double** data);
 double farthest_distance(int n, double** dist);
 double summed_distances(int n, double** dist);
-
 int freedistmx(int nrow, double** distance);
-
 void show_dists(int nrow,  double** distmx);
 
-/* Chapter 3 */
-int getclustercentroids(int nclusters, int nrows, int ncolumns,
-  double** data, int** mask, int clusterid[], double** cdata, int** cmask,
-  int transpose, char method);
-void getclustermedoids(int nclusters, int nelements, double** distance,
-  int clusterid[], int centroids[], double errors[]);
-void kcluster (int nclusters, int ngenes, int ndata, double** data,
-  int** mask, double weight[], int transpose, int npass, char method, char dist,
-  int clusterid[], double* error, int* ifound);
-void kmedoids (int nclusters, int nelements, double** distance,
-  int npass, int clusterid[], double* error, int* ifound);
-
-/* Chapter 4 */
 typedef struct {int left; int right; double distance;} Node;
 /*
  * A Node struct describes a single node in a tree created by hierarchical
@@ -87,30 +65,19 @@ typedef struct {int left; int right; double distance;} Node;
 int freeNodes(Node* mynode);
 
 
-Node* treecluster (int nrows, int ncolumns, double** data, int** mask,
-  double weight[], int transpose, char dist, char method, double** distmatrix);
+Node* treecluster (char dist, char method, int nrows, int ncolumns, double** dst, double** data);
 
 void cuttree (int nelements, Node* tree, int nclusters, int clusterid[]);
 
 int dumpTree(int nc,Node* tree,int lt[], int rt[], double dist[]);
 
-/* Chapter 5 */
-void somcluster (int nrows, int ncolumns, double** data, int** mask,
-  const double weight[], int transpose, int nxnodes, int nynodes,
-  double inittau, int niter, char dist, double*** celldata,
-  int clusterid[][2]);
 
-/* Chapter 6 */
-int pca(int m, int n, double** u, double** v, double* w);
+/* /\* Chapter 6 *\/ */
+/* int pca(int m, int n, double** u, double** v, double* w); */
 
-/* Utility routines, currently undocumented */
-void sort(int n, const double data[], int index[]);
-double mean(int n, double x[]);
-double median (int n, double x[]);
+/* /\* Utility routines, currently undocumented *\/ */
+ void sort(int n, const double data[], int index[]); 
 
-double* calculate_weights(int nrows, int ncolumns, double** data, int** mask,
-			  double weights[], double res[], int transpose, char dist, 
-			  double cutoff, double exponent);
 
 
 

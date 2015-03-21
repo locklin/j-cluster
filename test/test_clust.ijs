@@ -18,6 +18,7 @@ clust4=: ((50;10)tdrnd 50),((50;_10)tdrnd 50),((100;_90)tdrnd 50),(_90;0)tdrnd 5
 hc=: conew 'jcluster'
 create__hc 'e';'s';0;clust4
 'dst ab'=. dumptree__hc ''
+dumClust__hc''
 nclustLogMax dst
 
 destroy__hc''
@@ -46,12 +47,19 @@ testc=: 3 : 0
   destroy__tree ''
 )
 
+testBugs=: 3 : 0
+hc=: ('e';'s';0;clust4)conew'jcluster'
+tmp=: returnClustDx__hc ''
+assert. 4= ncl__hc
+assert. 
+)
+
 ndata =. 1e4 10 $?. 1e5$0
 
 
 smoutput testc ''
 smoutput testcutoff ''
 smoutput testfunctional''
-
+smoutput testBugs a:
 
 

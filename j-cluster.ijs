@@ -24,24 +24,29 @@ NB. normalize; 0 for none, 1 for variance normalized
 NB. 
 NB. data; a rank 2 array of doubles
 create=: 3 : 0
+if.1=$y do.
+ 'dist meth norm data'=: >y
+else.
  'dist meth norm data'=: y
- NB. distmx=: dist distancematrix ". norm {:: 'data';'zscoreData data'
- distmx=: dist distancematrix data
+end.
+ distmx=: dist distancematrix ". norm {:: 'data';'zscoreData data'
+ NB. distmx=: dist distancematrix data
  'nr nc' =: $ data
  cmd=. LIBCLUST,' treecluster * c c i i x *x'
  HC=: 0 pick cmd cd dist;meth;nr;nc;distmx;(unDoub data)
+ ncl=: 0
+ clustid=: nr $ 0
  1
 )
 
 destroy=: 3 : 0
  nr freedistmx distmx
  freenodes HC
- codestroy ''
+ codestroy a:
 )
 
 NB. gives cluster labels
 cutree=: 3 : 0
- clustid =. nr $ 0
  cmd=. LIBCLUST,' cuttree n i x i *i'
  4 pick cmd cd nr;HC;y;clustid
 )
@@ -75,9 +80,16 @@ dumptree=: 3 : 0
  dst;wx,.wy
 )
 
+
+returnClustDx=: 3 : 0
+ ncl=: ". ": nclustLogMax 0 pick dumptree a:   NB. weird you need to ".": this
+ clustid=: cutree ncl
+)
+
 NB. feed this the tree distances from dumptree
-nclustLogMax=: 1+ # - [: maxdx [: diff ^.
-nclustLogMax_z_ =: nclustLogMax_jcluster_
+nclustLogMax=:  1+ # - [: maxdx [: diff ^. 
+
+NB. nclustLogMax_z_ =: nclustLogMax_jcluster_
 
 mean=: +/%#
 variance=: mean@:*: - *:@mean
@@ -97,9 +109,6 @@ elseif. do.
 end.
 )
 
-
-NB. masker; may be useful later
-masker =: 0+ [: -. 128!:5 +. _ = ]
 
 unDoub =: 3 : 0
  (15!:14 <'y') +(8*{:$y)*i.{.$y

@@ -42,7 +42,7 @@ end.
 destroy=: 3 : 0
  nr freedistmx distmx
  freenodes HC
- codestroy a:
+ NB. codestroy a: NB. this guy probably causes problems
 )
 
 NB. gives cluster labels
@@ -83,7 +83,7 @@ dumptree=: 3 : 0
 
 returnClustDx=: 3 : 0
  ncl=: ". ": nclustLogMax 0 pick dumptree a:   NB. weird you need to ".": this
- clustid=: cutree ncl
+ clustid=:  cutree ncl
 )
 
 NB. feed this the tree distances from dumptree
@@ -178,8 +178,8 @@ freedistmx =: 4 : 0
 
 NB. x should be nr
 showdists=: 4 : 0
-cmd =. LIBCLUST,' show_dists n i x'
-cmd cd x;y
+ cmd =. LIBCLUST,' show_dists n i x'
+ cmd cd x;y
 )
 
 NB. clusterdistance =: 4 : 0

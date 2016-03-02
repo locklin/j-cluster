@@ -44,7 +44,7 @@
 #  include <windows.h>
 #endif
 
-#define CLUSTERVERSION "1.55"
+#define CLUSTERVERSION "2.0"
 
 double** distancematrix (int ngenes, int ndata, char dist, double** data);
 double farthest_distance(int n, double** dist);

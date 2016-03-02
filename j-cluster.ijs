@@ -51,21 +51,13 @@ cutree=: 3 : 0
  4 pick cmd cd nr;HC;y;clustid
 )
 
-uncentral=: 3 : 0
- distmx&uncent"0 i.nr
-)
-
-central=: 3 : 0
- distmx&cent"0 i.nr
-)
-
 uncent=: 4 : 0
  cmd =. LIBCLUST,' farthest_distance d i x'
  0 pick cmd cd y;x
 )
 
-cent=: 3 : 0
- cmd =. LIBCLUST,' summed_distance d i x' 
+cent=: 4 : 0
+ cmd =. LIBCLUST,' summed_distances d i x' 
  0 pick cmd cd y;x
 )
 

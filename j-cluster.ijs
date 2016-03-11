@@ -79,9 +79,9 @@ returnClustDx=: 3 : 0
 )
 
 NB. feed this the tree distances from dumptree
-nclustLogMax=:  1+ # - [: maxdx [: diff ^. 
+nclustLogMax =:  1+ # - [: maxdx [: diff ^. 
 
-NB. nclustLogMax_z_ =: nclustLogMax_jcluster_
+nclustLogMax_z_ =: nclustLogMax_jcluster_
 
 mean=: +/%#
 variance=: mean@:*: - *:@mean

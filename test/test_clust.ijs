@@ -15,25 +15,21 @@ tdrnd=: (([: > [: {. [) + [: ?. 0 $~ ]) ,. ([: > [: {: [) + [: ?. 0 $~ ]
 
 clust4=: ((50;10)tdrnd 50),((50;_10)tdrnd 50),((100;_90)tdrnd 50),(_90;0)tdrnd 50
 
+
+testcutoff =: 3 : 0
 hc=: conew 'jcluster'
 create__hc 'e';'s';0;clust4
 'dst ab'=. dumptree__hc ''
-dumClust__hc''
-nclustLogMax dst
-
+assert. 4=nclustLogMax dst NB. should find 4 clusters
 destroy__hc''
-
-testcutoff =: 3 : 0
-hc=: 'e';'s';0;clust4 create 'jcluster'
-NB. should find 4 clusters
 )
 
 testfunctional=: 3 : 0
- hr =: ('e';'s') treetst_jcluster_ clust4
+ hr =. ('e';'s') treetst_jcluster_ clust4
  dst=.0 pick 200 dumptreeIn_jcluster_ hr
  assert. 4=nclustLogMax dst
- hr =: ('e';'s') treetst_jcluster_ data
- assert. 32=O.0=cutreeIn_jcluster_ 50;hr;2
+ hr =. ('e';'s') treetst_jcluster_ data
+ assert. 32=I.0=cutreeIn_jcluster_ 50;hr;2
 )
 
 testc=: 3 : 0
@@ -42,16 +38,17 @@ testc=: 3 : 0
   assert. 32=I.0=cutree__hc 2
   assert. 0 2 3 4 5 6 7 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 =I.3=cutree__hc 4
  'dst cmx'=. dumptree__hc ''  
-  assert. 371.1= {:dst
+  assert. 1484.4 = {:dst NB. 371.1= ? test this
   assert. 32 _48={:cmx
-  destroy__tree ''
+  destroy__hc ''
 )
 
 testBugs=: 3 : 0
 hc=: ('e';'s';0;clust4)conew'jcluster'
 tmp=: returnClustDx__hc ''
-assert. 4= ncl__hc
-assert. 
+assert. 3 = 43{tmp
+assert. 2 = 53{tmp
+destroy__hc''
 )
 
 ndata =. 1e4 10 $?. 1e5$0

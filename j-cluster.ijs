@@ -63,12 +63,12 @@ cent=: 4 : 0
 
 NB. dumps the tree and splits
 dumptree=: 3 : 0
- cmd=. LIBCLUST,' dumpTree i i x *i *i *d'
+ cmd=. LIBCLUST,' dumpTree i i x &d &i &i'
  nnr =. nr  - 1
- dst =.  nnr $ 1.7 - 1.7
- wx =. nnr $ 1-1
- wy =. nnr $ 1-1
- cmd cd nnr;HC;wx;wy;dst
+ dst =.  memu 0.1 * i.nnr 
+ wx =. memu 0 + nnr $ 1-1
+ wy =. memu 0 + nnr $ 1-1
+ cmd cd nnr;HC;dst;wx;wy
  dst;wx,.wy
 )
 
@@ -91,7 +91,7 @@ maxdx=: [: I. >./ = ]
 
 3 : 0''
 if. UNAME-:'Linux' do.
-  LIBCLUST=:  '/home/scott/src/j-cluster/libhcluster.so'
+  LIBCLUST=:  '/home/scott/src/jstuff/j-cluster/libhcluster.so'
 elseif. UNAME-:'Darwin' do.
   'platform not supported' 13!:8[10
 elseif. UNAME-: 'Win' do.
@@ -130,12 +130,12 @@ treetst2 =: 3 : 0
 
 NB. dumps the splits and distances for  use with treetst
 dumptreeIn=: 4 : 0
- cmd=. LIBCLUST,' dumpTree i i x *i *i *d'
+cmd=. LIBCLUST,' dumpTree i i x &d &i &i'
  xx =. x - 1 
- dst =.  xx $ 1.7 - 1.7
- wx =. xx $ 1-1
- wy =. xx $ 1-1
- cmd cd xx;y;wx;wy;dst
+ dst =.  memu 0.1 * i.xx 
+ wx =. memu xx $ 1-1
+ wy =. memu xx $ 1-1
+ cmd cd xx;y;dst;wx;wy
  dst;wx,.wy
 )
 

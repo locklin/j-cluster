@@ -1,13 +1,15 @@
 load'tables/csv'
-load'j-cluster.ijs'
-raw =. readcsv 'test/usarrests.csv'
+load'../j-cluster.ijs'
+raw =. readcsv '../test/usarrests.csv'
 data =. > ". each }."1 }.raw
-genes=. > ". each readcsv 'test/gene.csv'
+genes=. > ". each readcsv '../test/gene.csv'
 rownames =. >0{"1 }.raw
-c4 =. >". each readcsv'test/4clust.csv'
+tdrnd=: (([: > [: {. [) + [: ?. 0 $~ ]) ,. ([: > [: {: [) + [: ?. 0 $~ ]
+c4=:clust4=: ((50;10)tdrnd 50),((50;_10)tdrnd 50),((100;_90)tdrnd 50),(_90;0)tdrnd 50
+NB.clust4 writecsv 'test/4clust.csv'
 
 hr =: ('e';'s') treetst_jcluster_ c4
-dst=.0 pick 200 dumptreeIn_jcluster_ hr
+]dst=.0 pick 200 dumptreeIn_jcluster_ hr
 nclustLogMax dst
 cutreeIn_jcluster_ 200;hr;4
 hr =: ('e';'s') treetst2_jcluster_ c4
@@ -33,9 +35,6 @@ destroy__hc ''
 
 
 
-tdrnd=: (([: > [: {. [) + [: ?. 0 $~ ]) ,. ([: > [: {: [) + [: ?. 0 $~ ]
-clust4=: ((50;10)tdrnd 50),((50;_10)tdrnd 50),((100;_90)tdrnd 50),(_90;0)tdrnd 50
-clust4 writecsv 'test/4clust.csv'
 
 
 hc=: ('e';'s';0;clust4) conew  'jcluster'

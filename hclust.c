@@ -829,7 +829,7 @@ void cuttree (int nelements, Node* tree, int nclusters, int clusterid[])  {
 
 /* ******************************************************************** */
 
-int dumpTree(int nr, Node* tree,int lt[], int rt[], double dist[]) {
+int dumpTree(int nr, Node* tree, double dist [], int lt[], int rt[]) {
   int i;
   for (i = 0; i < nr; i++) {
     lt[i] = tree[i].left;
@@ -838,6 +838,7 @@ int dumpTree(int nr, Node* tree,int lt[], int rt[], double dist[]) {
   }
   return 1;
 } 
+
 
 /* ******************************************************************** */
 

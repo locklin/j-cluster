@@ -69,7 +69,7 @@ Node* treecluster (char dist, char method, int nrows, int ncolumns, double** dst
 
 void cuttree (int nelements, Node* tree, int nclusters, int clusterid[]);
 
-int dumpTree(int nc,Node* tree,int lt[], int rt[], double dist[]);
+int dumpTree(int nc,Node* tree, double dist [], int lt[], int rt[]);
 
 
 /* /\* Chapter 6 *\/ */

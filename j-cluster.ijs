@@ -72,6 +72,17 @@ dumptree=: 3 : 0
  dst;wx,.wy
 )
 
+NB. dumps the tree and splits
+dumptree=: 3 : 0
+ cmd=. LIBCLUST,' dumpTree i i x *d *i *i'
+ nnr =. nr  - 1
+ dst =.  memu 0.1 * i.nnr 
+ wx =. memu 0 + nnr $ 1-1
+ wy =. memu 0 + nnr $ 1-1
+'dst wx wy' =. (3,4,5){   cmd cd xx;y;dst;wx;wy
+ dst;wx,.wy
+)
+
 
 returnClustDx=: 3 : 0
  ncl=: ". ": nclustLogMax 0 pick dumptree a:   NB. weird you need to ".": this
@@ -130,12 +141,12 @@ treetst2 =: 3 : 0
 
 NB. dumps the splits and distances for  use with treetst
 dumptreeIn=: 4 : 0
-cmd=. LIBCLUST,' dumpTree i i x &d &i &i'
+cmd=. LIBCLUST,' dumpTree i i x *d *i *i'
  xx =. x - 1 
  dst =.  memu 0.1 * i.xx 
  wx =. memu xx $ 1-1
  wy =. memu xx $ 1-1
- cmd cd xx;y;dst;wx;wy
+'dst wx wy' =. (3,4,5){   cmd cd xx;y;dst;wx;wy
  dst;wx,.wy
 )
 

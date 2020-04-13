@@ -36,13 +36,16 @@ end.
  HC=: 0 pick cmd cd dist;meth;nr;nc;distmx;(unDoub data)
  ncl=: 0
  clustid=: nr $ 0
+ freedc =: 1 NB. have to stick this in here for .... pointer reasons
  1
 )
 
 destroy=: 3 : 0
+ if. freedc=1 do. 
  nr freedistmx distmx
  freenodes HC
- NB. codestroy a: NB. this guy probably causes problems
+end.
+ freedc=: 0
 )
 
 NB. gives cluster labels
@@ -107,6 +110,7 @@ unDoub =: 3 : 0
  (15!:14 <'y') +(8*{:$y)*i.{.$y
 )
 
+NB. ########################################################## 
 NB. two examples of how to use the dll
 treetst =: 3 : 0
  ('e';'s') treetst y

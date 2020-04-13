@@ -10,6 +10,8 @@ NB.clust4 writecsv 'test/4clust.csv'
 
 hr =: ('e';'s') treetst_jcluster_ c4
 ]dst=.0 pick 200 dumptreeIn_jcluster_ hr
+
+]dst=.0 pick  dumptree_jcluster_ hr
 nclustLogMax dst
 cutreeIn_jcluster_ 200;hr;4
 hr =: ('e';'s') treetst2_jcluster_ c4
@@ -22,6 +24,11 @@ cutreeIn_jcluster_ 13;hr;4
 
 
 
+hc=: conew 'jcluster'
+create__hc 'e';'s';0;c4
+'dst cmx'=.dumptree__hc ''
+nclustLogMax dst
+destroy__hc ''
 
 
 

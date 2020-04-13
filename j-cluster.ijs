@@ -61,16 +61,6 @@ cent=: 4 : 0
  0 pick cmd cd y;x
 )
 
-NB. dumps the tree and splits
-dumptree=: 3 : 0
- cmd=. LIBCLUST,' dumpTree i i x &d &i &i'
- nnr =. nr  - 1
- dst =.  memu 0.1 * i.nnr 
- wx =. memu 0 + nnr $ 1-1
- wy =. memu 0 + nnr $ 1-1
- cmd cd nnr;HC;dst;wx;wy
- dst;wx,.wy
-)
 
 NB. dumps the tree and splits
 dumptree=: 3 : 0
@@ -79,7 +69,7 @@ dumptree=: 3 : 0
  dst =.  memu 0.1 * i.nnr 
  wx =. memu 0 + nnr $ 1-1
  wy =. memu 0 + nnr $ 1-1
-'dst wx wy' =. (3,4,5){   cmd cd xx;y;dst;wx;wy
+'dst wx wy' =. (3,4,5){   cmd cd nnr;HC;dst;wx;wy
  dst;wx,.wy
 )
 
